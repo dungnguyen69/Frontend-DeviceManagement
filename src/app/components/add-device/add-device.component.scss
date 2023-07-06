@@ -1,0 +1,24 @@
+.btn-cancel,
+.btn-create {
+    margin-right: 50px;
+}
+
+.add-device-header {
+    text-align: center;
+}
+
+label {
+    margin-right: 5px;
+    white-space: initial;
+    display: block;
+}
+
+.mat-dialog-actions {
+    &[align='end'] {
+        justify-content: flex-end;
+    }
+
+    &[align='center'] {
+        justify-content: center;
+    }
+}

@@ -1,0 +1,19 @@
+<h1 mat-dialog-title>Import device</h1>
+<div mat-dialog-actions>
+    <button type="button" class="btn btn-info download-template" (click)="onTemplateFileClick()">Download
+        template</button>
+    <div *ngIf="fileName == null; else elseBlock" class="uploadfilecontainer" (click)="fileInput.click()" appDragDrop
+        (onFileDropped)="onFileDropped($event)">
+        <h2>Drag and drop your .xslx</h2>
+        <input hidden type="file" #fileInput (change)="onFileSelected($event)" />
+    </div>
+    <ng-template #elseBlock>
+        <div class="file-name">
+            <h2>{{fileName}}</h2>
+            <div class="import-btn">
+                <button class="btn btn-success" type="button" (click)="onImportClick()">Import device</button>
+            </div>
+        </div>
+    </ng-template>
+    
+</div>

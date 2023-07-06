@@ -1,0 +1,205 @@
+<div mat-dialog-content class="dialog">
+  <div class="container ">
+    <div class="row add-device-row">
+      <h3 class="col-sm-12 add-device-header">Add new device</h3>
+    </div>
+  </div>
+  <form [formGroup]="addDeviceForm" (ngSubmit)="onSubmit()">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-lg-6 col-sm-12">
+          <div>
+            <label>Name</label>
+            <mat-form-field appearance="outline">
+              <input matInput formControlName="deviceName" placeholder="Enter name" type="text">
+              <mat-error *ngIf="addDeviceForm.controls['deviceName'].hasError('required')">Name is
+                required</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div>
+            <label>Status</label>
+            <mat-form-field appearance="outline">
+              <mat-select formControlName="statusId" placeholder="Choose status">
+                <!-- <mat-select-trigger></mat-select-trigger> -->
+                <mat-option>---</mat-option>
+                <mat-option *ngFor="let status of suggestionOptions[columnIndex.STATUS]" [value]="status.id">
+                  {{status.status}}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="addDeviceForm.controls['statusId'].hasError('required')">Status
+                is required</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div>
+            <label>Item type</label>
+            <mat-form-field appearance="outline">
+              <mat-select matNativeControl formControlName="itemTypeId" placeholder="Choose item type">
+                <mat-option>---</mat-option>
+                <mat-option *ngFor="let itemType of suggestionOptions[columnIndex.ITEM_TYPE]" [value]="itemType.id">
+                  {{itemType.name}}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="addDeviceForm.controls['itemTypeId'].hasError('required')">Item
+                Type is required</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div>
+            <label>Platform name</label>
+            <mat-form-field appearance="outline">
+              <mat-select matNativeControl formControlName="platformNameId" (valueChange)="getPlatformVersion($event)"
+                placeholder="Pick platform name">
+                <mat-option>---</mat-option>
+                <mat-option *ngFor="let platformName of suggestionOptions[columnIndex.PLATFORM_NAME]"
+                  [value]="platformName">
+                  {{platformName}}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="addDeviceForm.controls['platformNameId'].hasError('required')">Platform
+                Name is required</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div>
+            <label>Platform version</label>
+            <mat-form-field appearance="outline">
+              <mat-select matNativeControl formControlName="platformId" placeholder="Pick platform version">
+                <mat-option>---</mat-option>
+                <mat-option *ngFor="let platformVersion of suggestionOptions[columnIndex.PLATFORM_VERSION]"
+                  [value]="platformVersion.id">
+                  {{platformVersion.version}}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="addDeviceForm.controls['platformId'].hasError('required')">Platform
+                Version is required</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div>
+            <label>Ram size</label>
+            <mat-form-field appearance="outline">
+              <mat-select matNativeControl formControlName="ramId" placeholder="Choose ram size">
+                <mat-option>---</mat-option>
+                <mat-option *ngFor="let ramSize of suggestionOptions[columnIndex.RAM]" [value]="ramSize.id">
+                  {{ramSize.size}}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="addDeviceForm.controls['ramId'].hasError('required')">Ram
+                Size is required</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div>
+            <label>Screen size</label>
+            <mat-form-field appearance="outline">
+              <mat-select matNativeControl formControlName="screenId" placeholder="Choose screen size">
+                <mat-option>---</mat-option>
+                <mat-option *ngFor="let screenSize of suggestionOptions[columnIndex.SCREEN]" [value]="screenSize.id">
+                  {{screenSize.size}}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="addDeviceForm.controls['screenId'].hasError('required')">Screen
+                Size is required</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+
+        <div class="col-lg-6">
+          <div>
+            <label>Storage size</label>
+            <mat-form-field appearance="outline">
+              <mat-select matNativeControl formControlName="storageId" placeholder="Choose storage size">
+                <mat-option>---</mat-option>
+                <mat-option *ngFor="let storageSize of suggestionOptions[columnIndex.STORAGE]" [value]="storageSize.id">
+                  {{storageSize.size}}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="addDeviceForm.controls['storageId'].hasError('required')">Storage
+                Size is required</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div>
+            <label>Inventory number</label>
+            <mat-form-field appearance="outline">
+              <input matInput formControlName="inventoryNumber" type="text" placeholder="Enter inventory number">
+              <mat-error *ngIf="addDeviceForm.controls['inventoryNumber'].hasError('whitespace')">Inventory
+                Number is required</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div>
+            <label>Serial number</label>
+            <mat-form-field appearance="outline">
+              <input matInput formControlName="serialNumber" type="text" placeholder="Enter serial number">
+              <mat-error *ngIf="addDeviceForm.controls['serialNumber'].hasError('whitespace')">Serial
+                Number is required</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div>
+            <label>Project</label>
+            <mat-form-field appearance="outline">
+              <mat-select matNativeControl formControlName="projectId" placeholder="Choose project">
+                <mat-option>---</mat-option>
+                <mat-option *ngFor="let project of suggestionOptions[columnIndex.PROJECT]" [value]="project.id">
+                  {{project.name}}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="addDeviceForm.controls['projectId'].hasError('required')">Project is
+                required</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div>
+            <label>Origin</label>
+            <mat-form-field appearance="outline">
+              <mat-select matNativeControl formControlName="originId" placeholder="Choose origin">
+                <mat-option>---</mat-option>
+                <mat-option *ngFor="let origin of suggestionOptions[columnIndex.ORIGIN]" [value]="origin.id">
+                  {{origin.origin}}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="addDeviceForm.controls['originId'].hasError('required')">Origin
+                is required</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div>
+            <label>Owner</label>
+            <mat-form-field appearance="outline">
+              <input matInput formControlName="owner" placeholder="Enter owner" type="text" [matAutocomplete]="owner">
+              <mat-error *ngIf="addDeviceForm.controls['owner'].hasError('whitespace')">Owner
+                is required</mat-error>
+              <mat-autocomplete #owner="matAutocomplete">
+                <mat-option *ngFor="let owner of suggestionOptions[columnIndex.OWNER]" [value]="owner">
+                  {{owner}}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+    <div class="container">
+      <div class="row">
+        <div>
+          <label>Comments</label>
+          <textarea matInput formControlName="comments" class="form-control" cols="30" rows="8"
+            placeholder="Your Comments ....."></textarea>
+        </div>
+        <div mat-dialog-actions class="buttons" align="center">
+          <button type="button" class="btn-cancel btn btn-danger" (click)="onNoClick()">Cancel </button>
+          <button type="button" class="btn-create btn btn-success" type="submit">Create</button>
+        </div>
+      </div>
+    </div>
+
+  </form>
+
+</div>

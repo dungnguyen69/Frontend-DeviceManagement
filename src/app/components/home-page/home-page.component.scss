@@ -1,0 +1,38 @@
+.navbar {
+    background-color: #04AA6D;
+}
+
+.vertical-center {
+    top: 50%;
+    left: 45%;
+    margin: 0;
+    position: absolute;
+}
+
+.header-section {
+    margin-bottom: 20px;
+    padding-top: 20px;
+    display: flex;
+}
+
+.header-title {
+    text-align: center;
+    margin-left: 20px;
+    font-weight: bold;
+}
+
+.reset-filter {
+    @extend button;
+    margin-left: auto;
+}
+
+button {
+    margin-right: 50px;
+    font-weight: bold;
+    transition: transform .2s;
+}
+
+
+button:hover {
+    transform: scale(1.2);
+}

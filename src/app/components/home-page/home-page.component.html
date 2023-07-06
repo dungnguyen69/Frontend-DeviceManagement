@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <base href="/">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+
+<div class="vertical-center" *ngIf="!isLoggedIn; else elseBlock">
+    <h1>Welcome page</h1>
+</div>
+
+<ng-template #elseBlock>
+
+    <body style="background-color:aquamarine">
+        <div class="header-section">
+            <h2 class="header-title">Booking page</h2>
+            <button type="button" class="btn btn-secondary reset-filter" (click)="bookingPage.resetFilterValues()"
+                matTooltip="Rerset filter value(s)">Reset
+                filter</button>
+            <button type="button" class="btn btn-success" (click)="openDialogAddDevice()" matTooltip="Add a new device"
+                *ngIf="isMod || isAdmin">Add device</button>
+            <button type="button" class="btn btn-danger" matTooltip="Delete existing device(s)"
+                (click)="openConfirmationForDeletion()" *ngIf="isMod || isAdmin">Delete</button>
+            <button type="button" class="btn btn-warning" (click)="exportDevice()">Export</button>
+            <button type="button" class="btn btn-dark" (click)="importDevice()" *ngIf="isMod || isAdmin">Import</button>
+            <button type="button" class="btn btn-primary" (click)="submitting()" matBadge="{{totalBookingDevices}}"
+                matBadgePosition="after" matBadgeColor="accent">Submitting</button>
+        </div>
+        <app-booking-page (countNumberOfBookingDevices)="countDevices()"></app-booking-page>
+    </body>
+
+</ng-template>
+
+</html>

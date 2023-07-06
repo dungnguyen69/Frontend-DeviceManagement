@@ -1,0 +1,30 @@
+.btn-cancel,
+.btn-create {
+    margin-right: 50px;
+}
+
+.add-device-header {
+    text-align: center;
+
+}
+
+label {
+    margin-right: 5px;
+    white-space: initial;
+    display: block;
+}
+
+.mat-dialog-actions {
+    &[align='end'] {
+        justify-content: flex-end;
+    }
+
+    &[align='center'] {
+        justify-content: center;
+    }
+}
+
+::ng-deep .mat-form-field-appearance-outline.mat-form-field-disabled,
+::ng-deep .mat-form-field-outline {
+    opacity: 0;
+}

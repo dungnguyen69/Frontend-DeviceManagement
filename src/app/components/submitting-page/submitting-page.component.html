@@ -1,0 +1,185 @@
+<body style="background-color:aquamarine">
+    <div class="header-section">
+        <h2 class="header-title">Submitting page</h2>
+        <button type="button" class="btn btn-danger delete-btn" (click)="deleteDevice()">Delete</button>
+        <button type="button" class="btn btn-secondary" (click)="removeAll()">Remove all</button>
+    </div>
+    <section class="example-container mat-elevation-z8 border" tabindex="0">
+        <table mat-table [dataSource]="requests">
+            <ng-container matColumnDef="Number">
+                <th mat-header-cell *matHeaderCellDef class="noborder"><span>No.</span></th>
+                <td mat-cell *matCellDef="let element;let i=index"> {{i+1}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="Detail">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Detail</span>
+                </th>
+                <td mat-cell *matCellDef="let row;let i=index">
+                    <mat-icon class="detail-icon">pageview</mat-icon>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="Update">
+                <th mat-header-cell *matHeaderCellDef>
+                </th>
+            </ng-container>
+
+            <ng-container matColumnDef="SerialNumber">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Serial Number</span>
+                </th>
+                <td mat-cell *matCellDef="let element"> {{element.serialNumber }} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="Requester">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Requester</span>
+                </th>
+                <td mat-cell *matCellDef="let element"> {{element.requester}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="CurrentKeeper">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Current Keeper</span>
+                </th>
+                <td mat-cell *matCellDef="let element"> {{element.currentKeeper}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="NextKeeper">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Next Keeper</span>
+                </th>
+                <td mat-cell *matCellDef="let element; let index = index">
+                    <mat-form-field>
+                        <input matInput placeholder="Enter a next keeper" [(ngModel)]="element.nextKeeper"
+                            [matAutocomplete]="auto" (ngModelChange)="changeNextKeeper($event)">
+
+                        <button matSuffix mat-icon-button aria-label="Clear" (click)="element.nextKeeper =''">
+                            <mat-icon>close</mat-icon>
+                        </button>
+
+                        <mat-autocomplete #auto="matAutocomplete">
+                            <mat-option *ngFor="let option of this.nextKeeperOptions" [value]="option">
+                                {{option}}
+                            </mat-option>
+                        </mat-autocomplete>
+                    </mat-form-field>
+                </td>
+            </ng-container>
+
+
+            <ng-container matColumnDef="DeviceName">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Device Name</span>
+                </th>
+                <td mat-cell *matCellDef="let element"> {{element.deviceName}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="ItemType">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Item Type</span>
+                </th>
+                <td mat-cell *matCellDef="let element"> {{element.itemType}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="PlatformName">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Platform Name</span>
+                </th>
+                <td mat-cell *matCellDef="let element"> {{element.platformName}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="PlatformVersion">
+                <th mat-header-cell *matHeaderCellDef class="width-cell-filter-msmall">
+                    <span>Platform Version</span>
+                </th>
+                <td mat-cell *matCellDef="let element"> {{element.platformVersion}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="RamSize">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Ram Size</span>
+                </th>
+                <td mat-cell *matCellDef="let element"> {{element.ramSize}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="DisplaySize">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Display Size</span>
+                </th>
+                <td mat-cell *matCellDef="let element"> {{element.screenSize}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="StorageSize">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Storage Size</span>
+                </th>
+                <td mat-cell *matCellDef="let element"> {{element.storageSize}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="InventoryNumber">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Inventory Number</span>
+                </th>
+                <td mat-cell *matCellDef="let element"> {{element.inventoryNumber}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="Comments">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Comments</span>
+                </th>
+                <td mat-cell *matCellDef="let element"> {{element.comments}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="Action">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Action</span>
+                </th>
+                <td mat-cell *matCellDef="let row;let i=index">
+                    <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                        [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row, i)">
+                    </mat-checkbox>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="Booking date">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Booking date</span>
+                </th>
+                <td mat-cell *matCellDef="let element; let index = index">
+                    <mat-form-field>
+                        <input matInput [matDatepicker]="picker" placeholder="Choose a date"
+                            [(ngModel)]="element.bookingDate">
+                        <mat-icon matDatepickerToggleIcon (click)="element.bookingDate = ''">clear</mat-icon>
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                    </mat-form-field>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="Due date">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Due date</span>
+                </th>
+                <td mat-cell *matCellDef="let element;let index = index">
+                    <mat-form-field>
+                        <input matInput [matDatepicker]="picker" placeholder="Choose a date"
+                            [(ngModel)]="element.returnDate">
+                        <mat-icon matDatepickerToggleIcon (click)="element.returnDate = ''">clear</mat-icon>
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                    </mat-form-field>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="columns" class="first-header-row"></tr>
+            <tr mat-row *matRowDef="let row; columns: columns;"
+                [ngClass]="{'highlight': this.selection.selected.includes(row)}"></tr>
+        </table>
+    </section>
+
+    <div class="btns">
+        <button type="button" class="btn btn-success submit-btn" (click)="onSubmit()">Submit</button>
+        <button type="button" class="btn btn-danger cancel-btn" (click)="onNoClick()">Cancel</button>
+    </div>
+</body>

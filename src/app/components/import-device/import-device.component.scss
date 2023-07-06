@@ -1,0 +1,44 @@
+.uploadfilecontainer {
+  background-repeat: no-repeat;
+  background-size: 100px;
+  background-position: center;
+  height: 200px;
+  width: 80%;
+  margin: 20px auto;
+  border: 2px dashed #1c8adb;
+  border-radius: 10px;
+}
+
+.uploadfilecontainer:hover {
+  cursor: pointer;
+  background-color: #9ecbec !important;
+  opacity: 0.8;
+}
+
+h2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  margin: 0px;
+}
+
+.file-name {
+  height: 200px;
+  width: 80%;
+  border-radius: 10px;
+}
+
+
+.import-btn {
+  text-align: center;
+}
+
+.mat-mdc-dialog-actions {
+  justify-content: center !important;
+}
+
+h1 {
+  text-align: center;
+  font-weight: bold;
+}
