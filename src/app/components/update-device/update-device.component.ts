@@ -16,6 +16,7 @@ import { ADD_DEVICE } from 'src/app/utils/constant';
 export class UpdateDeviceComponent implements OnInit {
   addDeviceForm: FormGroup;
   submitted = false;
+  readOnly: boolean;
   USERNAME = 1;
   isStatusOccupied: boolean;
   OCCUPIED = "2";
@@ -56,6 +57,7 @@ export class UpdateDeviceComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any) {
     this.rowId = data.dataKey;
     this.deviceIndex = data.index;
+    this.readOnly = data.readOnly;
   }
 
   ngOnInit() {
@@ -154,10 +156,11 @@ export class UpdateDeviceComponent implements OnInit {
           bookingDate: data['detailDevice'].bookingDate,
           returnDate: data['detailDevice'].returnDate
         })
-        if (data['detailDevice'].statusId == "2") {
+        if (data['detailDevice'].statusId == "2" || this.readOnly) {
           this.isStatusOccupied = true;
           this.getOccupiedDevice();
         }
+
         let getPlatform: any = Object.values(this.unfilteredPlatformVersionSuggestions).filter((x: any) => x.id == data['detailDevice'].platformId)[0];
         this.getPlatformVersion(getPlatform.name);
       });
@@ -227,7 +230,10 @@ export class UpdateDeviceComponent implements OnInit {
   private getOccupiedDevice() {
     this.occupiedDevice.name = this.detailDevice.name;
     this.occupiedDevice.itemType = this.suggestionOptions[ADD_DEVICE.ITEM_TYPE].find((item: any) => item.id == this.addDeviceForm.value.itemTypeId).name;
-    this.occupiedDevice.status = "OCCUPIED";
+    if (this.readOnly)
+      this.occupiedDevice.status = this.suggestionOptions[ADD_DEVICE.STATUS].find((item: any) => item.id == this.addDeviceForm.value.statusId).status;
+    else if (this.addDeviceForm.value.statusId == "2")
+      this.occupiedDevice.status = "OCCUPIED";
     this.occupiedDevice.platformName = this.unfilteredPlatformVersionSuggestions.find((platform: any) => platform.id == this.addDeviceForm.value.platformId).name;
     this.occupiedDevice.platformVersion = this.unfilteredPlatformVersionSuggestions.find((platform: any) => platform.id == this.addDeviceForm.value.platformId).version;
     this.occupiedDevice.ram = this.suggestionOptions[ADD_DEVICE.RAM].find((ram: any) => ram.id == this.addDeviceForm.value.ramId).size;
@@ -255,7 +261,6 @@ export class UpdateDeviceComponent implements OnInit {
           this.suggestionOptions[ADD_DEVICE.PROJECT] = response['projectList'];
           this.suggestionOptions[ADD_DEVICE.ORIGIN] = response['originList'];
           this.suggestionOptions[ADD_DEVICE.ITEM_TYPE] = response['itemTypeList'];
-          console.log(this.suggestionOptions[ADD_DEVICE.PLATFORM_NAME]);
 
         },
         error: (error) => {

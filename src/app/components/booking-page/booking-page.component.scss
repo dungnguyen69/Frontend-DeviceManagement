@@ -71,3 +71,17 @@ mat-icon {
     color: aquamarine;
     transform: scale(1.5);
 }
+
+.first-header-row {
+    background-color: #212529;
+}
+
+th span {
+    color: white;
+    font-weight: bold;
+}
+
+::ng-deep .mat-sort-header-container:not(.mat-sort-header-sorted) .mat-sort-header-arrow {
+    opacity: 1 !important;
+    transform: none !important;
+}

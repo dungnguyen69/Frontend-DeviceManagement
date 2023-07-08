@@ -11,6 +11,7 @@ import { constants } from 'src/app/utils/constant';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RequestService } from 'src/app/services/request.service';
+import { UpdateDeviceComponent } from '../update-device/update-device.component';
 
 @Component({
   selector: 'app-submitting-page',
@@ -181,7 +182,7 @@ export class SubmittingPageComponent implements OnInit {
       });
     dialogRef.afterClosed().subscribe({
       next: (result) => {
-        if (result) {
+        if (result.event == "accept") {
           if (this.selection.selected.length != 0) {
             for (var device of this.selection.selected) {
               this.localService.removeData(device.Id.toString());
@@ -209,13 +210,24 @@ export class SubmittingPageComponent implements OnInit {
       });
     dialogRef.afterClosed().subscribe({
       next: (result) => {
-        if (result) {
+        if (result.event == "accept") {
           this.localService.clearData();
           this.notification('REMOVED SUCCESSFULLY', "error-snackbar");
           this.getDataFromStorage();
           this.recount.emit();
         }
       }
+    });
+  }
+
+  openDialogUpdate(rowId: number, tableIndex: number) {
+    this.dialog.open(UpdateDeviceComponent, {
+      data: {
+        dataKey: rowId,
+        submit: true,
+        index: tableIndex,
+        readOnly: true
+      }, disableClose: true
     });
   }
 

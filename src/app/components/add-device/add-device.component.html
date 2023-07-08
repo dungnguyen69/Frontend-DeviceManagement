@@ -21,9 +21,8 @@
             <label>Status</label>
             <mat-form-field appearance="outline">
               <mat-select formControlName="statusId" placeholder="Choose status">
-                <!-- <mat-select-trigger></mat-select-trigger> -->
                 <mat-option>---</mat-option>
-                <mat-option *ngFor="let status of suggestionOptions[columnIndex.STATUS]" [value]="status.id">
+                <mat-option *ngFor="let status of suggestionOptions[columnIndex.STATUS]" [value]="status.id" [disabled]="status.id === 2">
                   {{status.status}}
                 </mat-option>
               </mat-select>

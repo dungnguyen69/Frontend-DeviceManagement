@@ -11,7 +11,7 @@
           <div>
             <label>Name</label>
             <mat-form-field appearance="outline">
-              <input *ngIf="isStatusOccupied; else elseBlockName" matInput formControlName="name" readonly>
+              <input *ngIf="isStatusOccupied || readOnly; else elseBlockName" matInput formControlName="name" readonly>
               <ng-template #elseBlockName>
                 <input matInput formControlName="name" type="text">
               </ng-template>
@@ -23,12 +23,13 @@
           <div>
             <label>Status</label>
             <mat-form-field appearance="outline">
-              <ng-template [ngIf]="isStatusOccupied" [ngIfElse]="loading">
+              <ng-template [ngIf]="isStatusOccupied || readOnly" [ngIfElse]="loading">
                 <input matInput readonly [(ngModel)]="occupiedDevice.status" [ngModelOptions]="{standalone: true}">
               </ng-template>
+              
               <ng-template #loading>
                 <mat-select formControlName="statusId">
-                  <mat-option *ngFor="let status of suggestionOptions[columnIndex.STATUS]" [value]="status.id">
+                  <mat-option *ngFor="let status of suggestionOptions[columnIndex.STATUS]" [value]="status.id" [disabled]="status.id === 2">
                     {{status.status}}
                   </mat-option>
                 </mat-select>
@@ -115,7 +116,7 @@
 
           <div>
             <label>Screen size</label>
-            <mat-form-field appearance="outline" *ngIf="isStatusOccupied; else elseBlockscreen">
+            <mat-form-field appearance="outline" *ngIf="isStatusOccupied || readOnly; else elseBlockscreen">
               <input matInput readonly [(ngModel)]="occupiedDevice.screen" [ngModelOptions]="{standalone: true}">
             </mat-form-field>
 
@@ -156,7 +157,7 @@
 
           <div>
             <label>Inventory number</label>
-            <mat-form-field appearance="outline" *ngIf="isStatusOccupied; else elseBlockinventoryNumber">
+            <mat-form-field appearance="outline" *ngIf="isStatusOccupied || readOnly; else elseBlockinventoryNumber">
               <input matInput readonly formControlName="inventoryNumber">
             </mat-form-field>
             <ng-template #elseBlockinventoryNumber>
@@ -170,7 +171,7 @@
 
           <div>
             <label>Serial number</label>
-            <mat-form-field appearance="outline" *ngIf="isStatusOccupied; else elseBlockserialNumber">
+            <mat-form-field appearance="outline" *ngIf="isStatusOccupied || readOnly; else elseBlockserialNumber">
               <input matInput readonly formControlName="serialNumber">
             </mat-form-field>
             <ng-template #elseBlockserialNumber>
@@ -184,7 +185,7 @@
 
           <div>
             <label>Project</label>
-            <mat-form-field appearance="outline" *ngIf="isStatusOccupied; else elseBlockproject">
+            <mat-form-field appearance="outline" *ngIf="isStatusOccupied || readOnly; else elseBlockproject">
               <input matInput readonly [(ngModel)]="occupiedDevice.project" [ngModelOptions]="{standalone: true}">
             </mat-form-field>
             <ng-template #elseBlockproject>
@@ -202,7 +203,7 @@
 
           <div>
             <label>Origin</label>
-            <mat-form-field appearance="outline" *ngIf="isStatusOccupied; else elseBlockorigin">
+            <mat-form-field appearance="outline" *ngIf="isStatusOccupied || readOnly; else elseBlockorigin">
               <input matInput readonly [(ngModel)]="occupiedDevice.origin" [ngModelOptions]="{standalone: true}">
             </mat-form-field>
             <ng-template #elseBlockorigin>
@@ -220,7 +221,7 @@
 
           <div>
             <label>Owner</label>
-            <mat-form-field appearance="outline" *ngIf="isStatusOccupied; else elseBlockowner">
+            <mat-form-field appearance="outline" *ngIf="isStatusOccupied || readOnly; else elseBlockowner">
               <input matInput readonly formControlName="owner">
             </mat-form-field>
             <ng-template #elseBlockowner>
@@ -246,7 +247,7 @@
         <div>
           <label>Comments</label>
           <textarea matInput readonly formControlName="comments" class="form-control" cols="30" rows="8"
-            *ngIf="isStatusOccupied; else elseBlockcomments"></textarea>
+            *ngIf="isStatusOccupied || readOnly; else elseBlockcomments"></textarea>
           <ng-template #elseBlockcomments>
             <textarea matInput formControlName="comments" class="form-control" cols="30" rows="8"
               placeholder="Your Comments ....."></textarea>
@@ -255,7 +256,7 @@
         <div mat-dialog-actions class="buttons" align="center">
           <button type="button" class="btn-cancel btn btn-danger" (click)="onNoClick()">Cancel </button>
           <button type="button" class="btn-create btn btn-success" type="submit"
-            *ngIf="!isStatusOccupied;">Update</button>
+            *ngIf="!isStatusOccupied && !readOnly;">Update</button>
         </div>
       </div>
     </div>

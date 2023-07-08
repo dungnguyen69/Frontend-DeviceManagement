@@ -16,7 +16,7 @@
                     <span>Detail</span>
                 </th>
                 <td mat-cell *matCellDef="let row;let i=index">
-                    <mat-icon class="detail-icon">pageview</mat-icon>
+                    <mat-icon class="detail-icon" clicK (click)="openDialogUpdate(row.deviceId,i+1)">pageview</mat-icon>
                 </td>
             </ng-container>
             <ng-container matColumnDef="Update">
