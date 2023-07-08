@@ -38,4 +38,8 @@ export class RequestService {
       .forEach(([key, _]) => params = params.append(key, filteredValues[key]));
     return this.http.get(this.baseUrl + `api/requests/${employeeId}`, { params: params });
   }
+
+  updateRequestStatus(input: any): Observable<any> {
+    return this.http.post(this.baseUrl + 'api/requests/status-update', input);
+  }
 }

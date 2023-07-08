@@ -30,5 +30,6 @@ export const REQUEST = {
     DEVICE_NAME: 1,
     REQUESTER: 2,
     CURRENT_KEEPER: 3,
-    NEXT_KEEPER: 4
+    NEXT_KEEPER: 4,
+    APPROVER: 5
 }

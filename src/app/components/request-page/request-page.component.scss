@@ -91,7 +91,6 @@ mat-icon {
     float: right;
     top: -3px;
     cursor: pointer;
-    color: rgba(0, 0, 0, 0.54);
 }
 
 .detail-icon,
@@ -104,4 +103,25 @@ mat-icon {
 .booking-icon:hover {
     color: aquamarine;
     transform: scale(1.5);
+}
+
+.icon-action-approve {
+    color: #009900;
+}
+
+.icon-action-cancel {
+    color: #CC0000;
+}
+
+.icon-action-transferred {
+    color: #0000CC;
+}
+
+.first-header-row {
+    background-color: #212529;
+}
+
+th span{
+    color: white;
+    font-weight: bold;
 }
