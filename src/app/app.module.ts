@@ -24,20 +24,25 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { UpdateDeviceComponent } from './components/update-device/update-device.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import {MatSortModule} from '@angular/material/sort'; 
-import {MatTooltipModule} from '@angular/material/tooltip';
-import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component'; 
+import { MatSortModule } from '@angular/material/sort';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component';
 import { FileSaverModule } from 'ngx-filesaver';
 import { DatePipe } from '@angular/common';
 import { ImportDeviceComponent } from './components/import-device/import-device.component';
 import { DragDropDirective } from './components/import-device/drag-drop.directive';
-import {MatBadgeModule} from '@angular/material/badge';
+import { MatBadgeModule } from '@angular/material/badge';
 import { SubmittingPageComponent } from './components/submitting-page/submitting-page.component';
-import { LoginComponent } from './components/login/login.component'; 
+import { LoginComponent } from './components/login/login.component';
 import { authInterceptorProviders } from './utils/auth.interceptor';
 import { RequestPageComponent } from './components/request-page/request-page.component';
-import { WelcomePageComponent } from './components/welcome-page/welcome-page.component';
-
+import { UserPageComponent } from './components/user-page/user-page.component';
+import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
+import { MatChipsModule } from '@angular/material/chips';
+import { ProvidePermissionComponent } from './components/provide-permission/provide-permission.component';
+import { ProfilePageComponent } from './components/profile-page/profile-page.component';
+import { OwningPageComponent } from './components/owning-page/owning-page.component';
+import { KeepingPageComponent } from './components/keeping-page/keeping-page.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -51,7 +56,12 @@ import { WelcomePageComponent } from './components/welcome-page/welcome-page.com
     SubmittingPageComponent,
     LoginComponent,
     RequestPageComponent,
-    WelcomePageComponent
+    UserPageComponent,
+    ResetPasswordComponent,
+    ProvidePermissionComponent,
+    ProfilePageComponent,
+    OwningPageComponent,
+    KeepingPageComponent
   ],
   imports: [
     BrowserModule,
@@ -78,7 +88,9 @@ import { WelcomePageComponent } from './components/welcome-page/welcome-page.com
     MatSortModule,
     MatTooltipModule,
     FileSaverModule,
-    MatBadgeModule
+    MatBadgeModule,
+    MatProgressSpinnerModule,
+    MatChipsModule
   ],
   providers: [DatePipe, authInterceptorProviders],
   bootstrap: [AppComponent]

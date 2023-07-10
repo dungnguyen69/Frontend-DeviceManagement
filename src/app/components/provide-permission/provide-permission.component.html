@@ -1,0 +1,46 @@
+<section class="example-section">
+    <h2>Username: {{row.userName}}</h2>
+    <h4>Select permission:</h4>
+    <form [formGroup]="permissions" (ngSubmit)="onSubmit()">
+        <p><mat-checkbox formControlName="ADMINISTRATOR"
+                (click)="disableOthers('ADMINISTRATOR')">ADMINISTRATOR</mat-checkbox></p>
+        <p><mat-checkbox formControlName="MODERATOR" (click)="disableOthers('MODERATOR')">MODERATOR</mat-checkbox></p>
+        <p><mat-checkbox formControlName="USER" (click)="disableOthers('USER')">USER</mat-checkbox></p>
+        <div *ngIf="permissions.controls['USER'].value" id="contactOptionsGroup">
+            <p>Users are entitled to: </p>
+            <ul class="b">
+                <li>VIEW DEVICES</li>
+                <li>FILTER</li>
+                <li>EXPORT DEVICES</li>
+                <li>SUBMIT REQUESTS </li>
+                <li>VIEW REQUESTS</li>
+                <li>UPDATE REQUESTS' STATUS</li>
+            </ul>
+        </div>
+
+        <div *ngIf="permissions.controls['MODERATOR'].value" id="contactOptionsGroup">
+            <p>Mods are entitled to: </p>
+            <ul class="b">
+                <li>All user permissions</li>
+                <li>IMPORT DEVICES</li>
+                <li>UPDATE DEVICES</li>
+                <li>ADD DEVICES</li>
+                <li>DELETE DEVICES</li>
+            </ul>
+        </div>
+
+        <div *ngIf="permissions.controls['ADMINISTRATOR'].value" id="contactOptionsGroup">
+            <p>Admins are entitled to: </p>
+            <ul class="b">
+                <li>All mod permissions</li>
+                <li>VIEW ALL USERS' INFO</li>
+                <li>UPDATE USER PERMISSION </li>
+            </ul>
+        </div>
+        <div class="form-group">
+            <button class="btn btn-primary btn-block" type="submit">
+                Submit
+            </button>
+        </div>
+    </form>
+</section>

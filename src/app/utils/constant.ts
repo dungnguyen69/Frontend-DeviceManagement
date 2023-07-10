@@ -33,3 +33,12 @@ export const REQUEST = {
     NEXT_KEEPER: 4,
     APPROVER: 5
 }
+
+export const USER = {
+    BADGE_ID: 0,
+    USER_NAME: 1,
+    FIRST_NAME: 2,
+    LAST_NAME: 3,
+    EMAIL: 4,
+    PHONE_NUMBER: 5
+}

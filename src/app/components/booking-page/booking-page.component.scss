@@ -85,3 +85,18 @@ th span {
     opacity: 1 !important;
     transform: none !important;
 }
+
+.disable-booking {
+    transition: none;
+    color: black;
+    cursor: not-allowed;
+}
+
+.highlight {
+    background-color: #a8d4ab !important;
+    /* green */
+}
+
+.highlight:hover {
+    @extend .highlight;
+  }

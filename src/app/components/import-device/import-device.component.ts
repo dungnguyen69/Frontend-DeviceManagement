@@ -71,14 +71,14 @@ export class ImportDeviceComponent {
       .subscribe(response => {
         this.isLoading = false;
         this.fileName = null;
-        this.notification("IMPORTED SUCCESSFULLY", "success-snackbar");
+        this.notification("IMPORTED SUCCESSFULLY", 'Close', "success-snackbar");
         this.dialogRef.close({ event: "accept" });
       }, error => {
         this.isLoading = false;
         console.log(error.error.message);
-        
+
         this.errorMessage = "[ERROR] Import error please try again";
-        this.notification(error.error.message, "error-snackbar")
+        this.notification(error.error.message, 'Close', "error-snackbar")
       });
   }
 
@@ -90,8 +90,8 @@ export class ImportDeviceComponent {
       return number;
   }
 
-  notification(message: string, className: string) {
-    this._snackBar.open(message, '', {
+  notification(message: string, action: string, className: string) {
+    this._snackBar.open(message, action, {
       horizontalPosition: "right",
       verticalPosition: "top",
       duration: 4000,

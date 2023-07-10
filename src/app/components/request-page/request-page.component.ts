@@ -36,7 +36,7 @@ export const DD_MM_YYYY_Format = {
   ],
 })
 export class RequestPageComponent implements OnInit {
-  dataSource = new MatTableDataSource<any>();
+  dataSource = new MatTableDataSource<IRequest>();
   user: any;
   username: any;
   isLoggedIn: boolean;
@@ -48,8 +48,6 @@ export class RequestPageComponent implements OnInit {
   pageSize: number = 10;
   totalPages: number;
   size: number;
-  requester: any;
-  userInfo: any;
   sortBy: string = "id";
   sortDir: string = "desc";
   BOOKING_DATE: number = 5;
@@ -103,7 +101,7 @@ export class RequestPageComponent implements OnInit {
   changeFilterInput(event: any, key_name: (keyof typeof this.filteredValues), column: number) {
     if (this.isFilterFormEmpty(key_name)) {
       if (event === "") {
-        this.changeFilterValueToEmptyAndReset(key_name);
+        this.changeFilterValueToEmpty(key_name);
         this.keywordSuggestionOptions[column] = [];
         return;
       }
@@ -175,7 +173,7 @@ export class RequestPageComponent implements OnInit {
         submit: true,
         index: tableIndex,
         readOnly: true
-      }, disableClose: true
+      }
     });
   }
 
@@ -210,26 +208,26 @@ export class RequestPageComponent implements OnInit {
 
   sortData(sort: Sort) {
     if (!sort.active || sort.direction === '') {
-        return;
+      return;
     }
     this.sortBy = sort.active;
     this.sortDir = sort.direction;
     this.getRequestsWithPaging()
-}
+  }
 
   private updateRequestStatus(requestId: number, requestStatus: number, message: string) {
     let input = { requestId: requestId, requestStatus: requestStatus };
     this.requestService.updateRequestStatus(input).subscribe(
       res => {
         if (res) {
-          this.notification(message, 'success-snackbar');
+          this.notification(message,'Close', 'success-snackbar');
           this.getRequestsWithPaging();
         }
       })
   }
 
-  private notification(message: string, className: string): void {
-    this._snackBar.open(message, '', {
+  private notification(message: string, action: string, className: string): void {
+    this._snackBar.open(message, action, {
       horizontalPosition: "right",
       verticalPosition: "top",
       duration: 6000,
@@ -240,7 +238,7 @@ export class RequestPageComponent implements OnInit {
   private getRequestsWithPaging() {
     this.requestService.getRequestsWithPaging(this.user.id, this.pageSize!, this.pageIndex + 1, this.sortBy, this.sortDir, this.filteredValues)
       .subscribe((data: any) => {
-        
+
         this.dataSource.data = data['requestsList'];
         this.dropdownOptions.requestStatusList = data['requestStatusList'];
         this.totalPages = data['totalPages'];
@@ -258,7 +256,7 @@ export class RequestPageComponent implements OnInit {
         });
   }
 
-  private changeFilterValueToEmptyAndReset(key_name: (keyof typeof this.filteredValues)) {
+  private changeFilterValueToEmpty(key_name: (keyof typeof this.filteredValues)) {
     Object.entries(this.filteredValues).find(([key]) => {
       if (key === key_name)
         this.filteredValues[key] = "";

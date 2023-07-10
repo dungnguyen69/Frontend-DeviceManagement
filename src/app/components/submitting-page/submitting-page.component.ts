@@ -72,7 +72,7 @@ export class SubmittingPageComponent implements OnInit {
     while (i--) {
       archive[keys[i] as any] = JSON.parse(this.localService.getData(keys[i]));
     }
-    return archive;
+    return archive.filter(a => a);
   }
 
   onNoClick(): void {
@@ -159,8 +159,7 @@ export class SubmittingPageComponent implements OnInit {
               this.returnSubmitError(response["failedRequestsList"]);
             },
             error: (error) => {
-              this.notification(error, "error-snackbar")
-              console.log(error);
+              this.notification(error, 'Close', "error-snackbar")
               throw error;
             },
           }
@@ -186,8 +185,8 @@ export class SubmittingPageComponent implements OnInit {
           if (this.selection.selected.length != 0) {
             for (var device of this.selection.selected) {
               this.localService.removeData(device.Id.toString());
-              this.notification('REMOVED SUCCESSFULLY', "error-snackbar");
               this.getDataFromStorage();
+              this.notification('REMOVED SUCCESSFULLY', 'Close', "error-snackbar");
               this.recount.emit()
             }
           }
@@ -212,7 +211,7 @@ export class SubmittingPageComponent implements OnInit {
       next: (result) => {
         if (result.event == "accept") {
           this.localService.clearData();
-          this.notification('REMOVED SUCCESSFULLY', "error-snackbar");
+          this.notification('REMOVED SUCCESSFULLY', 'Close', "error-snackbar");
           this.getDataFromStorage();
           this.recount.emit();
         }
@@ -227,25 +226,21 @@ export class SubmittingPageComponent implements OnInit {
         submit: true,
         index: tableIndex,
         readOnly: true
-      }, disableClose: true
+      }
     });
   }
 
   private returnSubmitError(response: any) {
     let failResponse: any[] = []
-    console.log(response[0]);
-
-    for (let index = 0; index < response.length; index++) {
-      let pos = index + 1;
-      failResponse.push(pos + " :[" + response[index].errorMessage + "]")
-    }
+    for (let index = 0; index < response.length; index++)
+      failResponse.push("No " + Number(index + 1) + " :[" + response[index].errorMessage + "]")
     if (this.areThereSubmitErrors(failResponse)) {
       let spots = failResponse.join("\r\n");
       let message = `${spots}`;
-      this.notification(message, "error-snackbar")
+      this.notification(message, 'Close', "error-snackbar")
       return;
     }
-    this.notification("SUBMITTED SUCCESSFULLY", "success-snackbar")
+    this.notification("SUBMITTED SUCCESSFULLY", 'Close', "success-snackbar")
     this.dialogRef.close({ event: "Submit" });
     this.localService.clearData();
   }
@@ -261,8 +256,8 @@ export class SubmittingPageComponent implements OnInit {
       });
   }
 
-  private notification(message: string, className: string) {
-    this._snackBar.open(message, '', {
+  private notification(message: string, action: string, className: string) {
+    this._snackBar.open(message, action, {
       horizontalPosition: "right",
       verticalPosition: "top",
       duration: 10000,

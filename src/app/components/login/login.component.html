@@ -22,6 +22,7 @@
                         </div>
                     </div>
                 </div>
+                <a  [routerLink]="'/reset-password'">Forget password</a>
                 <div class="form-group">
                     <button class="btn btn-primary btn-block">
                         Login
@@ -33,9 +34,11 @@
                     </div>
                 </div>
             </form>
+            
+
             <div class="alert alert-success" *ngIf="isLoggedIn">
-            Logged in as {{ roles }}.
-        </div>
+                Logged in as {{ roles }}.
+            </div>
         </div>
     </div>
 </div>

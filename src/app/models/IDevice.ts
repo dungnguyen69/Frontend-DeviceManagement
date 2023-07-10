@@ -15,7 +15,7 @@ export interface IDevice {
     Keeper: string;
     Project: string;
     Origin: string;
-    KeeperNumber?: string;
+    KeeperNumber: number;
     BookingDate?: string;
     ReturnDate?: string;
   }

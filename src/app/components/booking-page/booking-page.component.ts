@@ -65,21 +65,22 @@ export class BookingPageComponent implements OnInit {
     filteredValues: { [key: string]: string } = {
         name: '', status: '', platformName: '', platformVersion: '',
         itemType: '', ram: '', screen: '', storage: '', owner: '',
-        keeper: '', inventoryNumber: '', serialNumber: '', origin: '', project: '', bookingDate: '', returnDate: ''
+        keeper: '', keeperNo: '', inventoryNumber: '', serialNumber: '', origin: '', project: '', bookingDate: '', returnDate: ''
     };
     readonly columnsIndex = constants;
     readonly pageSizeOptions: number[] = [10, 20, 50, 100];
     readonly columns: string[] = ['Number', 'Detail', 'SerialNumber', 'DeviceName', 'Status', 'ItemType', 'PlatformName', 'PlatformVersion',
-        'RamSize', 'DisplaySize', 'StorageSize', 'InventoryNumber', 'Project', 'Origin', 'Owner', 'Keeper', 'Comments', "Booking", "Booking date", "Due date", 'Action'];
+        'RamSize', 'DisplaySize', 'StorageSize', 'InventoryNumber', 'Project', 'Origin', 'Owner', 'Keeper', 'Comments', "KeeperNumber", "Booking", "Booking date", "Due date", 'Action'];
     readonly columnFilters: string[] = ['NumberFilter', 'Update', 'SerialNumberFilter', 'DeviceNameFilter', 'StatusFilter', 'ItemTypeFilter', 'PlatformNameFilter', 'PlatformVersionFilter',
-        'RamSizeFilter', 'DisplaySizeFilter', 'StorageSizeFilter', 'InventoryNumberFilter', 'ProjectFilter', 'OriginFilter', 'OwnerFilter', 'KeeperFilter', 'CommentsFilter', 'book', "booking date", "due date", 'select'];
+        'RamSizeFilter', 'DisplaySizeFilter', 'StorageSizeFilter', 'InventoryNumberFilter', 'ProjectFilter', 'OriginFilter', 'OwnerFilter', 'KeeperFilter', 'CommentsFilter', "KeeperNumberFilter", 'book', "booking date", "due date", 'select'];
 
     /* Store filter options in an array*/
     readonly dropdownOptions: { [key: string]: any } = {
         status: [],
         itemType: [],
         project: [],
-        origin: []
+        origin: [],
+        keeperNumberOptions: []
     }
 
     readonly dateFormControlnOptions: { [key: string]: any } = {
@@ -107,6 +108,13 @@ export class BookingPageComponent implements OnInit {
         'UNAVAILABLE': 'badge text-bg-dark  p-2'
     }
 
+    readonly keeperNumberDisplay: { [key: string]: any } = {
+        0: 'badge text-bg-success p-2',
+        1: 'badge text-bg-success p-2',
+        2: 'badge text-bg-success  p-2',
+        3: 'badge text-bg-danger  p-2'
+    }
+
     constructor(private dialog: MatDialog,
         private deviceService: DeviceService,
         private localStore: LocalService,
@@ -115,26 +123,8 @@ export class BookingPageComponent implements OnInit {
 
     ngOnInit() {
         this.getAllDevicesWithPagination();
-
-        this.dateFormControlnOptions[this.BOOKING_DATE].valueChanges.subscribe((value: string) => {
-            if (value != "" && value != null)
-                this.applyFilterForDatePicker("bookingDate", value);
-        })
-
-        this.dateFormControlnOptions[this.RETURN_DATE].valueChanges.subscribe((value: string) => {
-            if (value != "" && value != null)
-                this.applyFilterForDatePicker("returnDate", value);
-        })
-
-        this.isLoggedIn = this.tokenStorageService.isLoggedIn();
-        if (this.isLoggedIn) {
-          const user = this.tokenStorageService.getUser();
-          this.roles = user.roles;
-          this.isAdmin = this.roles.includes('ROLE_ADMIN');
-          this.isMod = this.roles.includes('ROLE_MODERATOR');
-          this.isUser = this.roles.includes('ROLE_USER');
-          this.username = user.username;
-        }
+        this.checkDateInput();
+        this.checkLogin();
     }
 
     applyFilterForDatePicker(column: string, option: string) {
@@ -155,38 +145,10 @@ export class BookingPageComponent implements OnInit {
         this.selection.clear();
     }
 
-    getAllDevicesWithPagination() {
-        this.deviceService
-            .getAllDevicesWithPagination(this.pageSize!, this.pageIndex + 1, this.sortBy, this.sortDir, this.filteredValues)
-            .subscribe((data: any) => {
-                console.log(data);
-
-                this.dataSource.data = data['devicesList'];
-                this.dropdownOptions.status = data['statusList'];
-                this.dropdownOptions.itemType = data['itemTypeList'];
-                this.dropdownOptions.project = data['projectList'];
-                this.dropdownOptions.origin = data['originList'];
-                this.totalPages = data['totalPages'];
-                this.size = data['totalElements'];
-            });
-    }
-
-    isFilterFormEmpty(key_name: (keyof typeof this.filteredValues)): boolean {
-        return this.filteredValues.hasOwnProperty(key_name);
-    }
-
-    changeFilterValueToEmptyAndReset(key_name: (keyof typeof this.filteredValues)) {
-        Object.entries(this.filteredValues).find(([key]) => {
-            if (key === key_name)
-                this.filteredValues[key] = "";
-        });
-        this.getAllDevicesWithPagination();
-    }
-
     changeFilterInput(event: any, key_name: (keyof typeof this.filteredValues), column: number) {
         if (this.isFilterFormEmpty(key_name)) {
             if (event === "") {
-                this.changeFilterValueToEmptyAndReset(key_name);
+                this.changeFilterValueToEmpty(key_name);
                 this.keywordSuggestionOptions[column] = [];
                 return;
             }
@@ -196,7 +158,6 @@ export class BookingPageComponent implements OnInit {
     }
 
     applyFilterForInputForm(e: MatAutocompleteSelectedEvent, column: string) {
-
         this.pageIndex = 0; /* Reset index */
         this.filteredValues = {
             ...this.filteredValues,
@@ -265,27 +226,19 @@ export class BookingPageComponent implements OnInit {
     }
 
     openDialogUpdate(rowId: number, tableIndex: number) {
+        let readOnly = !this.allowUpdate();
         this.dialog.open(UpdateDeviceComponent, {
             data: {
                 dataKey: rowId,
                 submit: true,
-                index: tableIndex
-            }, disableClose: true
+                index: tableIndex,
+                readOnly: readOnly
+            }
         }).afterClosed().subscribe((result) => {
             if (result.event == "Submit") {
                 this.refreshDataSourceWithoutFilter();
-                // this.isUpdatedSuccessful.emit(rowId);
             }
         });
-    }
-
-    /* Were user to not only update the device but also provide filters, the page would be refreshed without losing filters  */
-    refreshDataSourceWithoutFilter() {
-        const areFilterValuesChanged: boolean
-            = Object.values(this.filteredValues).every(x => x != "");
-        if (!(areFilterValuesChanged)) {
-            this.getAllDevicesWithPagination();
-        }
     }
 
     sortData(sort: Sort) {
@@ -299,8 +252,8 @@ export class BookingPageComponent implements OnInit {
 
     bookingDevices(device: IDevice) {
         if (!this.isClickable(device.Id)) {
-            const isDevicesExist = this.getDataStorage().find(e => e.deviceId.toString() === device.Id.toString());
-            if (device.Status === 'VACANT' && isDevicesExist === undefined) {
+            const isDevicesExistInStorage = this.getDataStorage().find(e => e.deviceId.toString() === device.Id.toString());
+            if (device.Status === 'VACANT' || (device.Status === 'OCCUPIED' && device.KeeperNumber < 3) && isDevicesExistInStorage === undefined) {
                 const request: IRequest = {
                     currentKeeper: device.Keeper,
                     nextKeeper: '',
@@ -316,24 +269,40 @@ export class BookingPageComponent implements OnInit {
                     storageSize: device.StorageSize,
                     inventoryNumber: device.InventoryNumber,
                     serialNumber: device.SerialNumber,
-                    Id: this.getDataStorage().length,
+                    Id: device.Id,
                     ticketId: '',
                     requester: this.username,
                 };
-                this.localStore.saveData(String(this.getDataStorage().length), JSON.stringify(request));
-                this.notification('Added to booking devices successfully', "success-snackbar");
+                this.localStore.saveData(String(request.Id), JSON.stringify(request));
+                this.notification('Added to booking devices successfully', 'Close', "success-snackbar");
                 this.countNumberOfBookingDevices.emit();
             }
-            if (isDevicesExist !== undefined) {
-                this.notification('This device is already in the booking dialog', "error-snackbar");
-            }
-            if (device.Status !== 'VACANT') {
-                this.notification('Device is unavailable', "error-snackbar");
+            if (isDevicesExistInStorage !== undefined) {
+                this.notification('This device is already in the booking dialog', 'Close', "error-snackbar");
             }
         }
     }
 
-    getDataStorage() {
+    isClickable(deviceId: any) {
+        const isDevicesExistInStorage = this.getDataStorage().find(e => e.deviceId.toString() === deviceId.toString());
+        return isDevicesExistInStorage;
+    }
+
+    handleBooking(deviceId: string) {
+        const isDevicesExistInStorage = this.getDataStorage().find(e => e.deviceId.toString() === deviceId.toString());
+        return isDevicesExistInStorage ? "disable-booking" : "booking-icon";
+    }
+
+    /* If users update the device whereas filters are still intact, the page will be refreshed without losing filters  */
+    private refreshDataSourceWithoutFilter() {
+        const areFilterValuesChanged: boolean
+            = Object.values(this.filteredValues).every(x => x != "");
+        if (!(areFilterValuesChanged)) {
+            this.getAllDevicesWithPagination();
+        }
+    }
+
+    private getDataStorage() {
         var archive = [],
             keys = Object.keys(localStorage),
             i = keys.length;
@@ -343,20 +312,71 @@ export class BookingPageComponent implements OnInit {
         return archive;
     }
 
-    isClickable(deviceId: any) {
-        return this.localStore.getData(deviceId);
+    getAllDevicesWithPagination() {
+        this.deviceService
+            .getAllDevicesWithPagination(this.pageSize!, this.pageIndex + 1, this.sortBy, this.sortDir, this.filteredValues)
+            .subscribe((data: any) => {
+                this.dataSource.data = data['devicesList'];
+                this.dropdownOptions.status = data['statusList'];
+                this.dropdownOptions.itemType = data['itemTypeList'];
+                this.dropdownOptions.project = data['projectList'];
+                this.dropdownOptions.origin = data['originList'];
+                this.dropdownOptions.keeperNumberOptions = data['keeperNumberOptions'];
+                this.totalPages = data['totalPages'];
+                this.size = data['totalElements'];
+            });
     }
 
-    handleBooking(deviceId: string) {
-        return this.localStore.getData(deviceId) ? "disable-booking" : "booking-icon";
+    private isFilterFormEmpty(key_name: (keyof typeof this.filteredValues)): boolean {
+        return this.filteredValues.hasOwnProperty(key_name);
     }
 
-    notification(message: string, className: string) {
-        this._snackBar.open(message, '', {
+    private changeFilterValueToEmpty(key_name: (keyof typeof this.filteredValues)) {
+        Object.entries(this.filteredValues).find(([key]) => {
+            if (key === key_name)
+                this.filteredValues[key] = "";
+        });
+        this.getAllDevicesWithPagination();
+    }
+
+    private notification(message: string, action: string, className: string) {
+        this._snackBar.open(message, action, {
             horizontalPosition: "right",
             verticalPosition: "top",
             duration: 4000,
             panelClass: [className]
         });
+    }
+
+    private checkDateInput() {
+        this.dateFormControlnOptions[this.BOOKING_DATE].valueChanges.subscribe((value: string) => {
+            if (value != "" && value != null)
+                this.applyFilterForDatePicker("bookingDate", value);
+        })
+
+        this.dateFormControlnOptions[this.RETURN_DATE].valueChanges.subscribe((value: string) => {
+            if (value != "" && value != null)
+                this.applyFilterForDatePicker("returnDate", value);
+        })
+    }
+
+    private checkLogin() {
+        this.isLoggedIn = this.tokenStorageService.isLoggedIn();
+        if (this.isLoggedIn) {
+            const user = this.tokenStorageService.getUser();
+            this.roles = user.roles;
+            this.isAdmin = this.roles.includes('ROLE_ADMIN');
+            this.isMod = this.roles.includes('ROLE_MODERATOR');
+            this.isUser = this.roles.includes('ROLE_USER');
+            this.username = user.username;
+        }
+    }
+
+    private allowUpdate() {
+        if (this.isAdmin)
+            return true;
+        else if (this.isMod)
+            return true;
+        return false;
     }
 }

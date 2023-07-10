@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { TokenStorageService } from './services/token-storage.service';
 import { Router } from '@angular/router';
+import { LocalService } from './services/local.service';
 
 
 @Component({
@@ -14,10 +15,10 @@ export class AppComponent implements OnInit {
   roles: string[] = [];
   isAdmin = false;
   isMod = false;
-  isUser = false; 
+  isUser = false;
   username?: string;
 
-  constructor(private tokenStorageService: TokenStorageService, private router: Router) { }
+  constructor(private tokenStorageService: TokenStorageService, private router: Router, private localService: LocalService) { }
 
   ngOnInit(): void {
     this.isLoggedIn = this.tokenStorageService.isLoggedIn(); /* this.tokenStorageService.getToken() != null ? true : false. */
@@ -39,6 +40,7 @@ export class AppComponent implements OnInit {
 
   logout(): void {
     this.tokenStorageService.logOut();
+    this.localService.clearData();
     window.location.reload();
   }
 }

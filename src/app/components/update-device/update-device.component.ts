@@ -115,7 +115,6 @@ export class UpdateDeviceComponent implements OnInit {
     this.addDeviceForm.controls["owner"].valueChanges
       .subscribe((value: string) => {
         if (value.trim().length != 0) {
-          console.log(value);
           this.usersSuggestion(this.USERNAME, value, true)
 
         }
@@ -181,7 +180,7 @@ export class UpdateDeviceComponent implements OnInit {
           {
             next: () => {
               this.dialogRef.close({ event: "Submit" });
-              this.notification("UPDATED SUCCESSFULLY", 'success-snackbar');
+              this.notification("UPDATED SUCCESSFULLY", 'Close', 'success-snackbar');
             },
             error: (error: any) => {
               this.areSuggestionValuesValid(error.error);
@@ -201,11 +200,11 @@ export class UpdateDeviceComponent implements OnInit {
     }
     let spots = arr.join("\r\n");
     let message = `${spots}`;
-    this.notification(message, 'error-snackbar');
+    this.notification(message, 'Close', 'error-snackbar');
   }
 
-  private notification(message: string, className: string): void {
-    this._snackBar.open(message, '', {
+  private notification(message: string, action: string, className: string): void {
+    this._snackBar.open(message, action, {
       horizontalPosition: "right",
       verticalPosition: "top",
       duration: 6000,
@@ -248,7 +247,7 @@ export class UpdateDeviceComponent implements OnInit {
     this.occupiedDevice.project = this.suggestionOptions[ADD_DEVICE.PROJECT].find((project: any) => project.id == this.addDeviceForm.value.projectId).name;
   }
 
-  private fetchDropdownValuesIntoSuggestions(): void {
+  fetchDropdownValuesIntoSuggestions(): void {
     this.deviceService.getDropDownValues().subscribe(
       {
         next: (response: any) => {

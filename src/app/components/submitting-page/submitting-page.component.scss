@@ -104,3 +104,12 @@ button:hover {
     margin-top: 20px;
     text-align: center;
 }
+
+.highlight {
+    background-color: #a8d4ab !important;
+    /* green */
+}
+
+.highlight:hover {
+    @extend .highlight;
+  }

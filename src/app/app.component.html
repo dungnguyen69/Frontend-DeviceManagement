@@ -1,6 +1,6 @@
 <div id="app">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand ms-5" href="/home">Home</a>
+        <a class="navbar-brand ms-5" [routerLink]="'/home'">Home</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -13,10 +13,10 @@
         <div class="collapse navbar-collapse justify-content-between" id="navbarSupportedContent" *ngIf="isLoggedIn">
             <ul class="navbar-nav ">
                 <li class="nav-item ms-5">
-                    <a class="nav-link" [routerLink]="'/request'">Requests</a>
+                    <a class="nav-link" [routerLink]="'/requests'">Requests</a>
                 </li>
-                <li class="nav-item ms-5">
-                    <a class="nav-link">Users</a>
+                <li class="nav-item ms-5" *ngIf="this.isAdmin">
+                    <a class="nav-link" [routerLink]="'/users'">Users</a>
                 </li>
                 <li class="nav-item dropdown ms-5">
                     <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown"
@@ -24,9 +24,9 @@
                         Devices
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item">Owning devices</a>
+                        <a class="dropdown-item" [routerLink]="'/owning'">Owning devices</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item">Keeping devices</a>
+                        <a class="dropdown-item" [routerLink]="'/keeping'">Keeping devices</a>
                     </div>
                 </li>
             </ul>
@@ -37,7 +37,7 @@
                         {{username}}
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">Profile</a>
+                        <a class="dropdown-item" [routerLink]="'/profile'">Profile</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" (click)="logout()" href="">Lougout</a>
                     </div>

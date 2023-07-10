@@ -56,7 +56,6 @@ export class HomePageComponent implements OnInit {
   }
   openDialogAddDevice() {
     const dialogRef = this.dialog.open(AddDeviceComponent, {
-      disableClose: true,
       autoFocus: false
     })
       .afterClosed().subscribe(
@@ -65,12 +64,12 @@ export class HomePageComponent implements OnInit {
             if (data.event == "Submit") {
               this.bookingPage.getAllDevicesWithPagination();
               this.addSuccessful = "ADDED SUCCESSFULLY";
-              this.notification(this.addSuccessful, "success-snackbar");
+              this.notification(this.addSuccessful, 'Close', "success-snackbar");
             }
           },
           error: () => {
             this.addUnsuccessful = "[ERROR] ADDED UNSUCCESSFULLY";
-            this.notification(this.addUnsuccessful, "error-snackbar");
+            this.notification(this.addUnsuccessful, 'Close', "error-snackbar");
           }
         }
       );
@@ -79,7 +78,6 @@ export class HomePageComponent implements OnInit {
 
   openConfirmationForDeletion() {
     this.dialog.open(ConfirmationDialogComponent, {
-      disableClose: true,
       data: {
         message: "Do you really want to delete ?",
       }
@@ -94,7 +92,7 @@ export class HomePageComponent implements OnInit {
           },
           error: () => {
             this.deleteUnsuccessful = "[ERROR] DELETED UNSUCCESSFULLY";
-            this.notification(this.addUnsuccessful, "error-snackbar");
+            this.notification(this.addUnsuccessful, 'Close', "error-snackbar");
           }
         }
       );
@@ -107,11 +105,11 @@ export class HomePageComponent implements OnInit {
           next: () => {
             this.bookingPage.getAllDevicesWithPagination();
             this.deleteSuccessful = "DELETED SUCCESSFULLY";
-            this.notification(this.deleteSuccessful, "success-snackbar");
+            this.notification(this.deleteSuccessful, 'Close', "success-snackbar");
           },
           error: () => {
             this.deleteUnsuccessful = "[ERROR] DELETED UNSUCCESSFULLY";
-            this.notification(this.deleteUnsuccessful, "error-snackbar");
+            this.notification(this.deleteUnsuccessful, 'Close', "error-snackbar");
           }
         });
       }
@@ -135,7 +133,6 @@ export class HomePageComponent implements OnInit {
 
   importDevice() {
     this.dialog.open(ImportDeviceComponent, {
-      disableClose: false
     })
       .afterClosed().subscribe(
         {
@@ -146,7 +143,7 @@ export class HomePageComponent implements OnInit {
           },
           error: () => {
             this.errorMessage = "[ERROR] Import error please try again";
-            this.notification(this.errorMessage, "error-snackbar")
+            this.notification(this.errorMessage, 'Close', "error-snackbar")
           }
         }
       );
@@ -166,7 +163,7 @@ export class HomePageComponent implements OnInit {
         },
         error: () => {
           this.errorMessage = "[ERROR] Import error please try again";
-          this.notification(this.errorMessage, "error-snackbar")
+          this.notification(this.errorMessage, 'Close', "error-snackbar")
         }
       }
     );
@@ -190,8 +187,8 @@ export class HomePageComponent implements OnInit {
       return number;
   }
 
-  private notification(message: string, className: string) {
-    this._snackBar.open(message, '', {
+  private notification(message: string, action: string, className: string) {
+    this._snackBar.open(message, action, {
       horizontalPosition: "right",
       verticalPosition: "top",
       duration: 4000,

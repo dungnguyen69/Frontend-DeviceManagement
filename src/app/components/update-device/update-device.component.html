@@ -1,8 +1,13 @@
 <div mat-dialog-content class="dialog">
-  <div class="container ">
-    <div class="row add-device-row">
-      <h3 class="col-sm-12 add-device-header">Update device no {{deviceIndex}}</h3>
+  <div class="container">
+    <div class="row add-device-row" *ngIf="isStatusOccupied || readOnly; else otherBlock">
+      <h3 class="col-sm-12 add-device-header">Device no {{deviceIndex}}</h3>
     </div>
+    <ng-template #otherBlock>
+      <div class="row add-device-row">
+        <h3 class="col-sm-12 add-device-header">Update device no {{deviceIndex}}</h3>
+      </div>
+    </ng-template>
   </div>
   <form [formGroup]="addDeviceForm" (ngSubmit)="onSubmit()" *ngIf="addDeviceForm; else loaded">
     <div class="container-fluid">
@@ -26,10 +31,11 @@
               <ng-template [ngIf]="isStatusOccupied || readOnly" [ngIfElse]="loading">
                 <input matInput readonly [(ngModel)]="occupiedDevice.status" [ngModelOptions]="{standalone: true}">
               </ng-template>
-              
+
               <ng-template #loading>
                 <mat-select formControlName="statusId">
-                  <mat-option *ngFor="let status of suggestionOptions[columnIndex.STATUS]" [value]="status.id" [disabled]="status.id === 2">
+                  <mat-option *ngFor="let status of suggestionOptions[columnIndex.STATUS]" [value]="status.id"
+                    [disabled]="status.id === 2">
                     {{status.status}}
                   </mat-option>
                 </mat-select>
@@ -65,7 +71,8 @@
             </mat-form-field>
             <ng-template #elseBlockplatformName>
               <mat-form-field appearance="outline">
-                <mat-select matNativeControl formControlName="platformNameId" (ngModelChange)="getPlatformVersion($event)" >
+                <mat-select matNativeControl formControlName="platformNameId"
+                  (ngModelChange)="getPlatformVersion($event)">
                   <mat-option *ngFor="let platformName of this.suggestionOptions[columnIndex.PLATFORM_NAME]"
                     [value]="platformName">
                     {{platformName}}
@@ -80,7 +87,8 @@
           <div>
             <label>Platform version</label>
             <mat-form-field appearance="outline" *ngIf="isStatusOccupied; else elseBlockplatformVersion">
-              <input matInput readonly [(ngModel)]="occupiedDevice.platformVersion" [ngModelOptions]="{standalone: true}">
+              <input matInput readonly [(ngModel)]="occupiedDevice.platformVersion"
+                [ngModelOptions]="{standalone: true}">
             </mat-form-field>
             <ng-template #elseBlockplatformVersion>
               <mat-form-field appearance="outline">

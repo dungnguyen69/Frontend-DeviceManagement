@@ -1,0 +1,84 @@
+<div mat-dialog-content class="dialog">
+    <div class="container ">
+        <div class="row add-device-row">
+            <h3 class="col-sm-12 add-device-header">Profile</h3>
+        </div>
+    </div>
+    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12 col-sm-12">
+                    <div>
+                        <label>BadgeId</label>
+                        <mat-form-field appearance="outline">
+                            <input matInput formControlName="badgeId" type="text" readonly>
+                        </mat-form-field>
+                    </div>
+
+                    <div>
+                        <label>User Name</label>
+                        <mat-form-field appearance="outline">
+                            <input matInput formControlName="userName" type="text">
+                            <mat-error *ngIf="profileForm.controls['userName'].hasError('required')">User Name is
+                                required</mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div>
+                        <label>First Name</label>
+                        <mat-form-field appearance="outline">
+                            <input matInput formControlName="firstName" type="text">
+                            <mat-error *ngIf="profileForm.controls['firstName'].hasError('required')">First Name is
+                                required</mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div>
+                        <label>Last Name</label>
+                        <mat-form-field appearance="outline">
+                            <input matInput formControlName="lastName" type="text">
+                            <mat-error *ngIf="profileForm.controls['lastName'].hasError('required')">Last Name is
+                                required</mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div>
+                        <label>Email</label>
+                        <mat-form-field appearance="outline">
+                            <input matInput formControlName="email" type="text">
+                            <mat-error *ngIf="profileForm.controls['email'].hasError('required')">Email is
+                                required</mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div>
+                        <label>Phone Number</label>
+                        <mat-form-field appearance="outline">
+                            <input matInput formControlName="phoneNumber" type="text">
+                            <mat-error *ngIf="profileForm.controls['phoneNumber'].hasError('required')">Phone Number is
+                                required</mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div>
+                        <label>Project</label>
+                        <mat-form-field appearance="outline">
+                            <input matInput formControlName="project" type="text" readonly>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="container">
+            <div class="row">
+                <div mat-dialog-actions class="buttons" align="center">
+                    <!-- <button type="button" class="btn-cancel btn btn-danger" (click)="onNoClick()">Cancel </button> -->
+                    <button type="button" class="btn-create btn btn-success" type="submit">Create</button>
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+</div>

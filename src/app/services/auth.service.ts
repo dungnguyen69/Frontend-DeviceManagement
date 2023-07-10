@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -19,8 +19,8 @@ export class AuthService {
     return this.http.post(this.baseUrl + 'api/users/login', { username, password }, httpOptions);
   }
 
-  logout(): Observable<any> {
-    return this.http.post(this.baseUrl + 'api/users/logout', { }, httpOptions);
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post(this.baseUrl + `api/users/reset_password?email=${email}`, httpOptions);
   }
 
   register(

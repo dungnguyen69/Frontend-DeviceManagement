@@ -151,7 +151,8 @@
                         <input matInput [matDatepicker]="picker" placeholder="Choose a date"
                             [(ngModel)]="element.bookingDate">
                         <mat-icon matDatepickerToggleIcon (click)="element.bookingDate = ''">clear</mat-icon>
-                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker-toggle matSuffix [for]="picker"
+                            matTooltip="If the booking date intially emerges, it means the previous order's booking date, choose the greater date"></mat-datepicker-toggle>
                         <mat-datepicker #picker></mat-datepicker>
                     </mat-form-field>
                 </td>
@@ -166,7 +167,8 @@
                         <input matInput [matDatepicker]="picker" placeholder="Choose a date"
                             [(ngModel)]="element.returnDate">
                         <mat-icon matDatepickerToggleIcon (click)="element.returnDate = ''">clear</mat-icon>
-                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker-toggle matSuffix [for]="picker"
+                            matTooltip="If the due date intially emerges, it means the previous order's due date, choose the lesser date"></mat-datepicker-toggle>
                         <mat-datepicker #picker></mat-datepicker>
                     </mat-form-field>
                 </td>

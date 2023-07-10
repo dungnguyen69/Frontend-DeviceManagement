@@ -4,20 +4,20 @@ import { AuthService } from 'src/app/services/auth.service';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  selector: 'app-reset-password',
+  templateUrl: './reset-password.component.html',
+  styleUrls: ['./reset-password.component.scss']
 })
-export class LoginComponent implements OnInit {
+export class ResetPasswordComponent implements OnInit {
   form: any = {
-    username: null,
-    password: null
+    email: null,
   };
   isLoggedIn = false;
   isLoginFailed = false;
   errorMessage = '';
   roles: string[] = [];
-
+  sentSuccesfull = false;
+  isSubmitted: boolean;
   constructor(private authService: AuthService, private tokenStorage: TokenStorageService,
     private _snackBar: MatSnackBar
   ) { }
@@ -30,27 +30,21 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit(): void {
-    const { username, password } = this.form;
-    this.authService.login(username, password).subscribe(
+    const { email } = this.form;
+    this.sentSuccesfull = false;
+    this.isSubmitted = true;
+    this.authService.forgotPassword(email).subscribe(
       data => {
-        console.log(data);
-
-        this.tokenStorage.saveUser(data);
-        this.isLoginFailed = false;
-        this.isLoggedIn = true;
-        this.roles = this.tokenStorage.getUser().roles;
-        this.reloadPage();
+        this.notification(data.message, 'Close', "success-snackbar")
+        this.sentSuccesfull = true;
       },
       err => {
+        this.isSubmitted = false;
         this.errorMessage = err.error.message;
         this.notification(this.errorMessage, 'Close', "error-snackbar")
         this.isLoginFailed = true;
       }
     );
-  }
-
-  private reloadPage(): void {
-    window.location.reload();
   }
 
   private notification(message: string, action: string, className: string) {
