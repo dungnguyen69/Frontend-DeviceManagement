@@ -18,9 +18,11 @@ export class UserService {
     let params = new HttpParams();
     params = params.append('column', column);
     params = params.append('keyword', keyword);
-    Object.entries(filteredValues)
+    if(filteredValues != undefined){
+      Object.entries(filteredValues)
       .filter(([_, value]) => value != "")
       .forEach(([key, _]) => params = params.append(key, filteredValues[key]));
+    }
     return this.http.get<String[]>(this.baseUrl + 'api/users/suggestion', { params: params });
   }
 

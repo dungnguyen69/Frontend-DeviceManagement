@@ -136,7 +136,6 @@ export class BookingPageComponent implements OnInit {
         this.getAllDevicesWithPagination();
     }
 
-    /* Receive user inputs for pagination */
     handlePagination(e: PageEvent) {
         this.size = this.size - this.pageSize;
         this.pageSize = e.pageSize;

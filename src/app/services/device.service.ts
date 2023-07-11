@@ -69,4 +69,16 @@ export class DeviceService {
   importDevice(data: any): Observable<any> {
     return this.http.post(this.baseUrl + `api/devices/warehouse/import`, data, { headers });
   }
+
+  getAllOwningDevicesWithPagination(ownerId: number, pageSize: number, pageNo: number, sortBy: string, sortDir: string, filteredValues?: any): Observable<any> {
+    let params = new HttpParams();
+    params = params.append('pageSize', pageSize);
+    params = params.append('pageNo', pageNo);
+    params = params.append('sortBy', sortBy);
+    params = params.append('sortDir', sortDir);
+    Object.entries(filteredValues)
+      .filter(([_, value]) => value != "")
+      .forEach(([key, _]) => params = params.append(key, filteredValues[key]));
+    return this.http.get(this.baseUrl + `api/devices/owners/${ownerId}`, { params: params });
+  }
 }
