@@ -37,13 +37,16 @@ import { LoginComponent } from './components/login/login.component';
 import { authInterceptorProviders } from './utils/auth.interceptor';
 import { RequestPageComponent } from './components/request-page/request-page.component';
 import { UserPageComponent } from './components/user-page/user-page.component';
-import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
+import { SendForgotPasswordComponent } from './components/send-forgot-password/send-forgot-password.component';
 import { MatChipsModule } from '@angular/material/chips';
 import { ProvidePermissionComponent } from './components/provide-permission/provide-permission.component';
 import { ProfilePageComponent } from './components/profile-page/profile-page.component';
 import { OwningPageComponent } from './components/owning-page/owning-page.component';
 import { KeepingPageComponent } from './components/keeping-page/keeping-page.component';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
+import { ReceiveForgotPasswordComponent } from './components/receive-forgot-password/receive-forgot-password.component';
+import { CookieService } from 'ngx-cookie-service';
+import { ErrorPageComponent } from './components/error-page/error-page.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -58,12 +61,14 @@ import { ResetPasswordComponent } from './components/reset-password/reset-passwo
     LoginComponent,
     RequestPageComponent,
     UserPageComponent,
-    ForgotPasswordComponent,
+    SendForgotPasswordComponent,
     ProvidePermissionComponent,
     ProfilePageComponent,
     OwningPageComponent,
     KeepingPageComponent,
-    ResetPasswordComponent
+    ResetPasswordComponent,
+    ReceiveForgotPasswordComponent,
+    ErrorPageComponent
   ],
   imports: [
     BrowserModule,
@@ -94,7 +99,7 @@ import { ResetPasswordComponent } from './components/reset-password/reset-passwo
     MatProgressSpinnerModule,
     MatChipsModule
   ],
-  providers: [DatePipe, authInterceptorProviders],
+  providers: [DatePipe, authInterceptorProviders, CookieService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

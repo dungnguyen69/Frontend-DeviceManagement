@@ -4,11 +4,11 @@ import { AuthService } from 'src/app/services/auth.service';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
 
 @Component({
-  selector: 'app-forgot-password',
-  templateUrl: './forgot-password.component.html',
-  styleUrls: ['./forgot-password.component.scss']
+  selector: 'app-send-forgot-password',
+  templateUrl: './send-forgot-password.component.html',
+  styleUrls: ['./send-forgot-password.component.scss']
 })
-export class ForgotPasswordComponent implements OnInit {
+export class SendForgotPasswordComponent implements OnInit {
   form: any = {
     email: null,
   };
