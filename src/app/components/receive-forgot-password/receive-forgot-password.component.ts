@@ -18,41 +18,27 @@ export class ReceiveForgotPasswordComponent {
   isLoggedIn = false;
   username?: string;
   changedSuccessfully = false;
-  constructor(private authService: AuthService, private tokenStorage: TokenStorageService,
-    private _snackBar: MatSnackBar, private router: Router, private cookieService: CookieService
-  ) { }
+  errorMessage = '';
+  isConfirmationFailed = false;
 
-  checkLogin() {
-    this.isLoggedIn = this.tokenStorage.isLoggedIn();
-    if (this.isLoggedIn) {
-      const user = this.tokenStorage.getUser();
-      this.username = user.username;
-    }
-  }
+  constructor(private authService: AuthService, private cookieService: CookieService
+  ) { }
 
   onSubmit(): void {
     const { newPassword, confirmPassword } = this.form;
-    console.log(this.cookieService.getAll().token);
     let token = this.cookieService.getAll().token;
     let inputs = { newPassword: newPassword, confirmPassword: confirmPassword, token: token }
     this.authService.saveForgotPassword(inputs).subscribe(
       {
-        next: (response: any) => {
+        next: () => {
           this.cookieService.delete('token');
           this.changedSuccessfully = true;
+          this.isConfirmationFailed = false;
         },
         error: (error) => {
-          this.notification(error.error.message, "Close", "error-snackbar");
+          this.errorMessage = error.error.message;
+          this.isConfirmationFailed = true;
         },
       });
-  }
-
-  private notification(message: string, action: string, className: string) {
-    this._snackBar.open(message, action, {
-      horizontalPosition: "right",
-      verticalPosition: "top",
-      duration: 4000,
-      panelClass: [className]
-    });
   }
 }

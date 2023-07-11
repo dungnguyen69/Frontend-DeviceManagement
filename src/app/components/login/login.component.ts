@@ -41,7 +41,6 @@ export class LoginComponent implements OnInit {
       },
       err => {
         this.errorMessage = err.error.message;
-        this.notification(this.errorMessage, 'Close', "error-snackbar")
         this.isLoginFailed = true;
       }
     );
@@ -49,14 +48,5 @@ export class LoginComponent implements OnInit {
 
   private reloadPage(): void {
     window.location.reload();
-  }
-
-  private notification(message: string, action: string, className: string) {
-    this._snackBar.open(message, action, {
-      horizontalPosition: "right",
-      verticalPosition: "top",
-      duration: 4000,
-      panelClass: [className]
-    });
   }
 }

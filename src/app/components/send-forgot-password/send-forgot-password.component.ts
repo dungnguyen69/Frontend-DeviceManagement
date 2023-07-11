@@ -18,6 +18,8 @@ export class SendForgotPasswordComponent implements OnInit {
   roles: string[] = [];
   sentSuccesfull = false;
   isSubmitted: boolean;
+  isConfirmationFailed = false;
+
   constructor(private authService: AuthService, private tokenStorage: TokenStorageService,
     private _snackBar: MatSnackBar
   ) { }
@@ -34,18 +36,19 @@ export class SendForgotPasswordComponent implements OnInit {
     this.sentSuccesfull = false;
     this.isSubmitted = true;
     this.authService.forgotPassword(email).subscribe(
-      data => {
-        this.notification(data.message, 'Close', "success-snackbar")
-        this.sentSuccesfull = true;
-      },
-      err => {
-        this.isSubmitted = false;
-        this.errorMessage = err.error.message;
-        this.notification(this.errorMessage, 'Close', "error-snackbar")
-        this.isLoginFailed = true;
-      }
-    );
-  }
+      {
+        next: () => {
+          this.sentSuccesfull = true;
+          this.isConfirmationFailed = false;
+        },
+        error: (error) => {
+          this.isSubmitted = false;
+          this.errorMessage = error.error.message;
+          this.isConfirmationFailed = true;
+        },
+      });
+
+    }
 
   private notification(message: string, action: string, className: string) {
     this._snackBar.open(message, action, {

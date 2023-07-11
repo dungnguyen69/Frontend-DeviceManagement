@@ -24,11 +24,13 @@ export class AuthService {
   }
 
   saveForgotPassword(password: any): Observable<any> {
-    console.log(password);
-    
     return this.http.put(this.baseUrl + `api/users/save_forgot_password`, password, httpOptions);
   }
 
+
+  saveResetPassword(password: any): Observable<any> {
+    return this.http.put(this.baseUrl + `api/users/save_reset_password`, password, httpOptions);
+  }
   register(
     userName: string,
     email: string,
