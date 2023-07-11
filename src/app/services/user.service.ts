@@ -36,11 +36,14 @@ export class UserService {
     return this.http.get(this.baseUrl + 'api/users', { params: params });
   }
 
-  providePermission(userId: number, permission: string): Observable<String[]> {
-    // let input = {userId: userId, permission: permission}
+  providePermission(userId: number, permission: string): Observable<any> {
     let params = new HttpParams();
     params = params.append('userId', userId);
     params = params.append('permission', permission);
-    return this.http.post<String[]>(this.baseUrl + 'api/users/authorization', params );
+    return this.http.put(this.baseUrl + 'api/users/authorization', params );
+  }
+
+  updateProfile(profile: any): Observable<any> {
+    return this.http.put(this.baseUrl + 'api/users/update_profile', profile );
   }
 }

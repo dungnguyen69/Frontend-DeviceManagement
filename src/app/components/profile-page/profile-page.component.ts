@@ -22,6 +22,7 @@ export class ProfilePageComponent {
   isMod = false;
   isUser = false;
   username?: string;
+  badgeId: string;
   readonly suggestionOptions: { [key: string]: any } = {
     0: [],
     1: [],
@@ -42,9 +43,7 @@ export class ProfilePageComponent {
 
   ngOnInit(): void {
     this.profileForm = new FormGroup({
-      badgeId: new FormControl('', Validators.compose([
-        Validators.required
-      ])),
+      id: new FormControl(''),
       userName: new FormControl('', Validators.compose([
         Validators.required
       ])),
@@ -55,7 +54,7 @@ export class ProfilePageComponent {
         Validators.required
       ])),
       email: new FormControl('', Validators.compose([
-        Validators.required
+        Validators.required, Validators.email
       ])),
       phoneNumber: new FormControl('', Validators.compose([
         Validators.required
@@ -79,9 +78,24 @@ export class ProfilePageComponent {
     this.checkLogin();
   }
 
-  onSubmit() { }
+  onSubmit() {
+    if (this.profileForm.valid) {
+      this.userService.updateProfile(this.profileForm.value)
+        .subscribe
+        (
+          {
+            next: (data: any) => {
+              this.notification(data.message, 'Close', 'success-snackbar');
+            },
+            error: (error: any) => {
+              this.notification(error.message, 'Close', 'success-snackbar');
+            },
+          }
+        );
+    }
+  }
 
-  checkLogin() {
+  private checkLogin() {
     this.isLoggedIn = this.tokenStorageService.isLoggedIn();
     if (this.isLoggedIn) {
       const user = this.tokenStorageService.getUser();
@@ -90,11 +104,9 @@ export class ProfilePageComponent {
       this.isMod = this.roles.includes('ROLE_MODERATOR');
       this.isUser = this.roles.includes('ROLE_USER');
       this.username = user.username;
-      console.log(user);
-      
-
+      this.badgeId = user.badgeId;
       this.profileForm.setValue({
-        badgeId: user.badgeId,
+        id: user.id,
         userName: user.username,
         firstName: user.firstName,
         lastName: user.lastName,
@@ -103,5 +115,14 @@ export class ProfilePageComponent {
         project: user.project
       })
     }
+  }
+
+  private notification(message: string, action: string, className: string): void {
+    this._snackBar.open(message, action, {
+      horizontalPosition: "right",
+      verticalPosition: "top",
+      duration: 6000,
+      panelClass: [className]
+    });
   }
 }
