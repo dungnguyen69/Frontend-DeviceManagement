@@ -3,6 +3,7 @@ import { FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@a
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DeviceService } from 'src/app/services/device.service';
+import { TokenStorageService } from 'src/app/services/token-storage.service';
 import { UserService } from 'src/app/services/user.service';
 import { ADD_DEVICE } from 'src/app/utils/constant';
 
@@ -15,6 +16,13 @@ export class AddDeviceComponent implements OnInit {
   addDeviceForm: FormGroup;
   submitted = false;
   USERNAME = 1;
+  roles: string[] = [];
+  isLoggedIn = false;
+  isAdmin = false;
+  isMod = false;
+  isUser = false;
+  userName: string;
+
   readonly suggestionOptions: { [key: string]: any } = {
     0: [],
     1: [],
@@ -33,9 +41,10 @@ export class AddDeviceComponent implements OnInit {
   constructor(public fb: FormBuilder, public dialogRef: MatDialogRef<AddDeviceComponent>,
     private deviceService: DeviceService,
     private userService: UserService,
-    private _snackBar: MatSnackBar) { }
+    private _snackBar: MatSnackBar, private tokenStorageService: TokenStorageService) { }
 
   ngOnInit(): void {
+    this.checkLogin();
     this.addDeviceForm = new FormGroup({
       deviceName: new FormControl('', Validators.compose([
         Validators.required
@@ -74,42 +83,12 @@ export class AddDeviceComponent implements OnInit {
       originId: new FormControl('', Validators.compose([
         Validators.required
       ])),
-      owner: new FormControl('', Validators.compose([
+      owner: new FormControl(this.userName, Validators.compose([
         Validators.required, this.noWhitespaceValidator as ValidatorFn
       ]))
     }, { updateOn: 'change' });
 
-    this.addDeviceForm.controls["owner"].valueChanges
-      .subscribe((value: string) => {
-        if (value.trim().length != 0) {
-          this.employeeSuggestion(this.USERNAME, value, true)
-        }
-        // else {
-        //   this.ownerSuggestions = [];
-        // }
-      })
-
     this.fetchDropdownValuesIntoSuggestions();
-  }
-
-  fetchDropdownValuesIntoSuggestions(): void {
-    this.deviceService.getDropDownValues().subscribe(
-      {
-        next: (response: any) => {
-          this.suggestionOptions[ADD_DEVICE.PLATFORM_NAME] = [...new Set(response['platformList'].map((a: any) => a.name))];
-          this.unfilteredPlatformVersionSuggestions = response['platformList'];
-          this.suggestionOptions[ADD_DEVICE.RAM] = response['ramList'];
-          this.suggestionOptions[ADD_DEVICE.SCREEN] = response['screenList'];
-          this.suggestionOptions[ADD_DEVICE.STORAGE] = response['storageList'];
-          this.suggestionOptions[ADD_DEVICE.STATUS] = response['statusList'];
-          this.suggestionOptions[ADD_DEVICE.PROJECT] = response['projectList'];
-          this.suggestionOptions[ADD_DEVICE.ORIGIN] = response['originList'];
-          this.suggestionOptions[ADD_DEVICE.ITEM_TYPE] = response['itemTypeList'];
-        },
-        error: (error) => {
-          console.error(error);
-        },
-      });
   }
 
   getPlatformVersion(event: any): void {
@@ -146,8 +125,28 @@ export class AddDeviceComponent implements OnInit {
     }
   }
 
+  private fetchDropdownValuesIntoSuggestions(): void {
+    this.deviceService.getDropDownValues().subscribe(
+      {
+        next: (response: any) => {
+          this.suggestionOptions[ADD_DEVICE.PLATFORM_NAME] = [...new Set(response['platformList'].map((a: any) => a.name))];
+          this.unfilteredPlatformVersionSuggestions = response['platformList'];
+          this.suggestionOptions[ADD_DEVICE.RAM] = response['ramList'];
+          this.suggestionOptions[ADD_DEVICE.SCREEN] = response['screenList'];
+          this.suggestionOptions[ADD_DEVICE.STORAGE] = response['storageList'];
+          this.suggestionOptions[ADD_DEVICE.STATUS] = response['statusList'];
+          this.suggestionOptions[ADD_DEVICE.PROJECT] = response['projectList'];
+          this.suggestionOptions[ADD_DEVICE.ORIGIN] = response['originList'];
+          this.suggestionOptions[ADD_DEVICE.ITEM_TYPE] = response['itemTypeList'];
+        },
+        error: (error) => {
+          console.error(error);
+        },
+      });
+  }
+
   //Check whether inputs whose tables are in the database match the database. 
-  areSuggestionValuesValid(errors: any): void {
+  private areSuggestionValuesValid(errors: any): void {
     let arr: string[] = [];
     if (errors.length >= 1) {
       errors.forEach((error: { message: string; }) => {
@@ -157,7 +156,7 @@ export class AddDeviceComponent implements OnInit {
     this.invalidNotification(arr);
   }
 
-  invalidNotification(arr: string[]): void {
+  private invalidNotification(arr: string[]): void {
     let spots = arr.join("\r\n");
     let message = `${spots}`;
     this._snackBar.open(message, '', {
@@ -174,5 +173,17 @@ export class AddDeviceComponent implements OnInit {
         if (isOwner)
           this.suggestionOptions[this.columnIndex.OWNER] = data['keywordList'];
       });
+  }
+
+  private checkLogin() {
+    this.isLoggedIn = this.tokenStorageService.isLoggedIn();
+    if (this.isLoggedIn) {
+      const user = this.tokenStorageService.getUser();
+      this.roles = user.roles;
+      this.isAdmin = this.roles.includes('ROLE_ADMIN');
+      this.isMod = this.roles.includes('ROLE_MODERATOR');
+      this.isUser = this.roles.includes('ROLE_USER');
+      this.userName = user.username;
+    }
   }
 }

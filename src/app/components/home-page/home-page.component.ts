@@ -23,8 +23,6 @@ export class HomePageComponent implements OnInit {
   selectedDevices = new SelectionModel();
   addSuccessful: string;
   addUnsuccessful: string;
-  deleteSuccessful: string;
-  deleteUnsuccessful: string;
   errorMessage: string;
   totalBookingDevices: number = 0;
   roles: string[] = [];
@@ -61,7 +59,7 @@ export class HomePageComponent implements OnInit {
       .afterClosed().subscribe(
         {
           next: (data: any) => {
-            if (data.event == "Submit") {
+            if (data?.event == "Submit") {
               this.bookingPage.getAllDevicesWithPagination();
               this.addSuccessful = "ADDED SUCCESSFULLY";
               this.notification(this.addSuccessful, 'Close', "success-snackbar");
@@ -89,10 +87,6 @@ export class HomePageComponent implements OnInit {
               this.deleteDevice(this.bookingPage.selection.selected);
               this.bookingPage.selection.clear();
             }
-          },
-          error: () => {
-            this.deleteUnsuccessful = "[ERROR] DELETED UNSUCCESSFULLY";
-            this.notification(this.addUnsuccessful, 'Close', "error-snackbar");
           }
         }
       );
@@ -104,12 +98,11 @@ export class HomePageComponent implements OnInit {
         this.deviceService.deleteDevice(device.Id!).subscribe({
           next: () => {
             this.bookingPage.getAllDevicesWithPagination();
-            this.deleteSuccessful = "DELETED SUCCESSFULLY";
-            this.notification(this.deleteSuccessful, 'Close', "success-snackbar");
+            this.notification("DELETED SUCCESSFULLY", 'Close', "success-snackbar");
           },
-          error: () => {
-            this.deleteUnsuccessful = "[ERROR] DELETED UNSUCCESSFULLY";
-            this.notification(this.deleteUnsuccessful, 'Close', "error-snackbar");
+          error: (error) => {
+            let errorMessage = error.error.errorMessage;
+            this.notification(errorMessage, 'Close', "error-snackbar");
           }
         });
       }

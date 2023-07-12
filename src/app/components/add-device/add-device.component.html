@@ -170,14 +170,7 @@
           <div>
             <label>Owner</label>
             <mat-form-field appearance="outline">
-              <input matInput formControlName="owner" placeholder="Enter owner" type="text" [matAutocomplete]="owner">
-              <mat-error *ngIf="addDeviceForm.controls['owner'].hasError('whitespace')">Owner
-                is required</mat-error>
-              <mat-autocomplete #owner="matAutocomplete">
-                <mat-option *ngFor="let owner of suggestionOptions[columnIndex.OWNER]" [value]="owner">
-                  {{owner}}
-                </mat-option>
-              </mat-autocomplete>
+              <input matInput formControlName="owner" placeholder="Enter owner" type="text" readonly>
             </mat-form-field>
           </div>
 
