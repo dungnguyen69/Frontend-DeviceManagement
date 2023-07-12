@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <base href="/">
@@ -222,7 +223,8 @@
                     <span>Permission</span>
                 </th>
                 <td mat-cell *matCellDef="let row;let i=index">
-                    <mat-icon *ngIf="!(row.userName == username)" (click)="openProvidePermissionDialog(row,i+1)" class="detail-icon">pageview</mat-icon>
+                    <mat-icon *ngIf="!(row.userName == username)" (click)="openProvidePermissionDialog(row,i+1)"
+                        class="detail-icon">pageview</mat-icon>
                 </td>
             </ng-container>
             <ng-container matColumnDef="action">
@@ -231,7 +233,8 @@
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="columns" class="first-header-row"></tr>
-            <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+            <tr mat-row *matRowDef="let row; columns: columns;"
+                [ngClass]="{'highlight': row.userName == username}"></tr>
             <tr mat-header-row *matHeaderRowDef="columnFilters" class="second-header-row"></tr>
 
         </table>
