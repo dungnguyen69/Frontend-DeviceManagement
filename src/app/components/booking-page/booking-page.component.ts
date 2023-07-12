@@ -234,7 +234,7 @@ export class BookingPageComponent implements OnInit {
                 readOnly: readOnly
             }
         }).afterClosed().subscribe((result) => {
-            if (result.event == "Submit") {
+            if (result?.event == "Submit") {
                 this.refreshDataSourceWithoutFilter();
             }
         });

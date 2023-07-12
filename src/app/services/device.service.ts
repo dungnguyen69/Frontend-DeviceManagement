@@ -62,12 +62,16 @@ export class DeviceService {
     return this.http.get(this.baseUrl + `api/devices/warehouse/export`, { headers, responseType: 'blob' });
   }
 
+  exportDeviceForOwner(userId: number): Observable<any> {
+    return this.http.get(this.baseUrl + `api/devices/warehouse/export/${userId}`, { headers, responseType: 'blob' });
+  }
+
   getTemplateImportDevice(): Observable<any> {
     return this.http.get(this.baseUrl + `api/devices/warehouse/download-template`, { headers, responseType: 'blob' });
   }
 
-  importDevice(data: any): Observable<any> {
-    return this.http.post(this.baseUrl + `api/devices/warehouse/import`, data, { headers });
+  importDevice(userId: number, data: any): Observable<any> {
+    return this.http.post(this.baseUrl + `api/devices/warehouse/import/${userId}`, data, { headers });
   }
 
   getAllOwningDevicesWithPagination(ownerId: number, pageSize: number, pageNo: number, sortBy: string, sortDir: string, filteredValues?: any): Observable<any> {

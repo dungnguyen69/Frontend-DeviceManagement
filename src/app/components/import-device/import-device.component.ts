@@ -1,26 +1,35 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { BookingPageComponent } from '../booking-page/booking-page.component';
 import { DeviceService } from 'src/app/services/device.service';
 import { MatDialogRef } from '@angular/material/dialog';
 import { saveAs } from 'file-saver';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { TokenStorageService } from 'src/app/services/token-storage.service';
 
 @Component({
   selector: 'app-import-device',
   templateUrl: './import-device.component.html',
   styleUrls: ['./import-device.component.scss']
 })
-export class ImportDeviceComponent {
+export class ImportDeviceComponent implements OnInit {
 
   fileName = null;
   errorMessage: string;
   fileUploaded: File;
   isLoading = false;
+  userId: number;
+  rowIndex: number = 0;
+  roles: string[] = [];
+  isLoggedIn = false;
+
   @ViewChild(BookingPageComponent) bookingTable: BookingPageComponent;
   constructor(
     private importService: DeviceService,
     public dialogRef: MatDialogRef<ImportDeviceComponent>,
-    private _snackBar: MatSnackBar) {
+    private _snackBar: MatSnackBar, private tokenStorageService: TokenStorageService) {
+  }
+  ngOnInit(): void {
+    this.checkLogin();
   }
 
   onTemplateFileClick() {
@@ -57,45 +66,56 @@ export class ImportDeviceComponent {
 
   }
 
-  downLoadFile(fileName: string, data: any, type: string) {
+  onImportClick() {
+    this.isLoading = true;
+    let formData: FormData = new FormData();
+    formData.append("file", this.fileUploaded);
+    this.importService.importDevice(this.userId, formData)
+      .subscribe(
+        {
+          next: () => {
+            this.isLoading = false;
+            this.fileName = null;
+            this.notification("IMPORTED SUCCESSFULLY", 'Close', "success-snackbar");
+            this.dialogRef.close({ event: "accept" });
+          }, error: (error) => {
+            this.isLoading = false;
+            this.areSuggestionValuesValid(error.error.errors)
+          }
+        });
+
+  }
+
+  private areSuggestionValuesValid(errors: any): void {
+    let arr: string[] = [];
+    errors.forEach((error: string) => {
+      arr.push("[" + error + "]");
+    })
+    let spots = arr.join("\r\n");
+    let message = `${spots}`;
+    this.notification(message, 'Close', "error-snackbar");
+  }
+
+  private downLoadFile(fileName: string, data: any, type: string) {
     let blob = new Blob([data], { type: type });
     let url = window.URL.createObjectURL(blob);
     saveAs(url, fileName)
   }
 
-  onImportClick() {
-    this.isLoading = true;
-    let formData: FormData = new FormData();
-    formData.append("file", this.fileUploaded);
-    this.importService.importDevice(formData)
-      .subscribe(response => {
-        this.isLoading = false;
-        this.fileName = null;
-        this.notification("IMPORTED SUCCESSFULLY", 'Close', "success-snackbar");
-        this.dialogRef.close({ event: "accept" });
-      }, error => {
-        this.isLoading = false;
-        console.log(error.error.message);
-
-        this.errorMessage = "[ERROR] Import error please try again";
-        this.notification(error.error.message, 'Close', "error-snackbar")
-      });
-  }
-
-  formatNumber(number: any) {
-    if (number < 10) {
-      return '0' + number;
-    }
-    else
-      return number;
-  }
-
-  notification(message: string, action: string, className: string) {
+  private notification(message: string, action: string, className: string) {
     this._snackBar.open(message, action, {
       horizontalPosition: "right",
       verticalPosition: "top",
       duration: 4000,
       panelClass: [className]
     });
+  }
+
+  private checkLogin() {
+    this.isLoggedIn = this.tokenStorageService.isLoggedIn();
+    if (this.isLoggedIn) {
+      const user = this.tokenStorageService.getUser();
+      this.userId = user.id;
+    }
   }
 }

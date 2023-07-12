@@ -13,6 +13,10 @@ import { constants } from 'src/app/utils/constant';
 import { UpdateDeviceComponent } from '../update-device/update-device.component';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { PageEvent } from '@angular/material/paginator';
+import { AddDeviceComponent } from '../add-device/add-device.component';
+import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
+import * as saveAs from 'file-saver';
+import { ImportDeviceComponent } from '../import-device/import-device.component';
 
 @Component({
   selector: 'app-owning-page',
@@ -39,6 +43,8 @@ export class OwningPageComponent {
   isAdmin = false;
   isMod = false;
   isUser = false;
+  addSuccessful: string;
+  addUnsuccessful: string;
   filteredValues: { [key: string]: string } = {
     name: '', status: '', platformName: '', platformVersion: '',
     itemType: '', ram: '', screen: '', storage: '', owner: '',
@@ -95,7 +101,6 @@ export class OwningPageComponent {
 
   constructor(private dialog: MatDialog,
     private deviceService: DeviceService,
-    private localStore: LocalService,
     private _snackBar: MatSnackBar,
     private tokenStorageService: TokenStorageService) { }
 
@@ -103,6 +108,79 @@ export class OwningPageComponent {
     this.checkLogin();
     this.getAllDevicesWithPagination();
     this.checkDateInput();
+  }
+
+  openDialogAddDevice() {
+    const dialogRef = this.dialog.open(AddDeviceComponent, {
+      autoFocus: false
+    })
+      .afterClosed().subscribe(
+        {
+          next: (data: any) => {
+            if (data?.event == "Submit") {
+              this.getAllDevicesWithPagination();
+              this.addSuccessful = "ADDED SUCCESSFULLY";
+              this.notification(this.addSuccessful, 'Close', "success-snackbar");
+            }
+          },
+          error: () => {
+            this.addUnsuccessful = "[ERROR] ADDED UNSUCCESSFULLY";
+            this.notification(this.addUnsuccessful, 'Close', "error-snackbar");
+          }
+        }
+      );
+    return dialogRef;
+  }
+
+  exportDevice() {
+    this.deviceService.exportDeviceForOwner(this.userId).subscribe((data: any) => {
+      let datetime = new Date()
+      let currentTime = (datetime.getFullYear() + '-' +
+        this.formatNumber(datetime.getMonth() + 1) + '-' +
+        this.formatNumber(datetime.getDate()) + ' ' +
+        this.formatNumber(datetime.getHours()) + '-' +
+        this.formatNumber(datetime.getMinutes()) + '-' +
+        this.formatNumber(datetime.getSeconds())).toString();
+      let exportDate = "Export_File_" + currentTime + ".xlsx";
+      this.downLoadFile(exportDate, data, "application/ms-excel");
+    }
+    )
+  }
+
+  importDevice() {
+    this.dialog.open(ImportDeviceComponent, {
+    })
+      .afterClosed().subscribe(
+        {
+          next: (result: any) => {
+            if (result?.event == "accept") {
+              this.getAllDevicesWithPagination();
+            }
+          },
+          error: () => {
+            let errorMessage = "[ERROR] Import error please try again";
+            this.notification(errorMessage, 'Close', "error-snackbar")
+          }
+        }
+      );
+  }
+
+  openConfirmationForDeletion() {
+    this.dialog.open(ConfirmationDialogComponent, {
+      data: {
+        message: "Do you really want to delete ?",
+      }
+    })
+      .afterClosed().subscribe(
+        {
+          next: (result) => {
+            if (result.event == "accept") {
+              this.deleteDevice(this.selection.selected);
+              this.selection.clear();
+            }
+          }
+        }
+      );
   }
 
   applyFilterForDropdowns(date?: string) {
@@ -226,6 +304,20 @@ export class OwningPageComponent {
     this.getAllDevicesWithPagination();
   }
 
+  private downLoadFile(fileName: string, data: any, type: string) {
+    let blob = new Blob([data], { type: type });
+    let url = window.URL.createObjectURL(blob);
+    saveAs(url, fileName)
+  }
+
+  private formatNumber(number: any) {
+    if (number < 10) {
+      return '0' + number;
+    }
+    else
+      return number;
+  }
+
   private getAllDevicesWithPagination() {
     this.deviceService
       .getAllOwningDevicesWithPagination(this.userId, this.pageSize!, this.pageIndex + 1, this.sortBy, this.sortDir, this.filteredValues)
@@ -238,7 +330,6 @@ export class OwningPageComponent {
         this.dropdownOptions.keeperNumberOptions = data['keeperNumberOptions'];
         this.totalPages = data['totalPages'];
         this.size = data['totalElements'];
-
       });
   }
 
@@ -293,4 +384,31 @@ export class OwningPageComponent {
       return true;
     return false;
   }
+
+  private notification(message: string, action: string, className: string) {
+    this._snackBar.open(message, action, {
+      horizontalPosition: "right",
+      verticalPosition: "top",
+      duration: 4000,
+      panelClass: [className]
+    });
+  }
+
+  private deleteDevice(selectList: any) {
+    if (selectList.length != 0) {
+      for (var device of selectList) {
+        this.deviceService.deleteDevice(device.Id!).subscribe({
+          next: () => {
+            this.getAllDevicesWithPagination();
+            this.notification("DELETED SUCCESSFULLY", 'Close', "success-snackbar");
+          },
+          error: (error) => {
+            let errorMessage = error.error.errorMessage;
+            this.notification(errorMessage, 'Close', "error-snackbar");
+          }
+        });
+      }
+    }
+  }
+
 }
