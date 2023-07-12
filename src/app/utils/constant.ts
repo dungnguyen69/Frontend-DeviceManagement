@@ -28,10 +28,11 @@ export const ADD_DEVICE = {
 export const REQUEST = {
     REQUEST_ID: 0,
     DEVICE_NAME: 1,
-    REQUESTER: 2,
-    CURRENT_KEEPER: 3,
-    NEXT_KEEPER: 4,
-    APPROVER: 5
+    DEVICE_SERIAL_NUMBER: 2,
+    REQUESTER: 3,
+    CURRENT_KEEPER: 4,
+    NEXT_KEEPER: 5,
+    APPROVER: 6
 }
 
 export const USER = {

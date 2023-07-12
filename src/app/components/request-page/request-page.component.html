@@ -79,6 +79,32 @@
                 </th>
             </ng-container>
 
+            <ng-container matColumnDef="DeviceSerialNumber">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="serialNumber">
+                    <span>Device Serial Number</span>
+                </th>
+                <td mat-cell *matCellDef="let element"> {{element.device_serial_number}} </td>
+            </ng-container>
+            <ng-container matColumnDef="DeviceSerialNumberFilter">
+                <th mat-header-cell *matHeaderCellDef class="width-cell-filter-msmall">
+                    <div>
+                        <mat-form-field appearance="outline">
+                            <input type="text" [ngModel]="filteredValues.serialNumber" matInput
+                                (ngModelChange)="changeFilterInput($event,'serialNumber', columnsIndex.DEVICE_SERIAL_NUMBER)"
+                                [matAutocomplete]="auto" placeholder="Enter device serial number">
+                            <mat-autocomplete #auto="matAutocomplete"
+                                (optionSelected)="applyFilterForInputForm($event,'serialNumber')">
+                                <mat-option
+                                    *ngFor="let option of this.keywordSuggestionOptions[columnsIndex.DEVICE_SERIAL_NUMBER]"
+                                    [value]="option">
+                                    {{option}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                    </div>
+                </th>
+            </ng-container>
+
             <ng-container matColumnDef="DeviceName">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header="device">
                     <span>Device Name</span>

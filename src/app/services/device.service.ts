@@ -88,8 +88,6 @@ export class DeviceService {
 
   updateReturnOwnedDevice(deviceId: number, currentKeeperId: number): Observable<any> {
     let inputs = { deviceId: deviceId, currentKeeperId: currentKeeperId}
-    console.log(inputs);
-    
     return this.http.put(this.baseUrl + `api/devices/owners/return`, inputs, { headers });
   }
 }

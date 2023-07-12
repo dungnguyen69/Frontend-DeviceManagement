@@ -62,11 +62,11 @@ export class RequestPageComponent implements OnInit {
 
   columnsIndex = REQUEST;
   filteredValues: { [key: string]: string } = {
-    requestId: '', device: '', approver: '', currentKeeper: '', nextKeeper: '',
+    requestId: '', serialNumber: '', device: '', approver: '', currentKeeper: '', nextKeeper: '',
     requester: '', requestStatus: '', bookingDate: '', returnDate: ''
   };
-  readonly columns: string[] = ['Number', 'View', 'RequestId', 'DeviceName', 'Approver', 'Requester', 'CurrentKeeper', 'NextKeeper', "Booking date", "Due date", 'RequestStatus', 'Action'];
-  readonly columnFilters: string[] = ['NumberFilter', 'Detail', 'RequestFilter', 'DeviceNameFilter', 'ApproverFilter', 'RequesterFilter', 'CurrentKeeperFilter', 'NextKeeperFilter', "BookingDateFilter", "DueDateFilter", 'RequestStatusFilter', 'select'];
+  readonly columns: string[] = ['Number', 'View', 'RequestId', "DeviceSerialNumber", 'DeviceName', 'Approver', 'Requester', 'CurrentKeeper', 'NextKeeper', "Booking date", "Due date", 'RequestStatus', 'Action'];
+  readonly columnFilters: string[] = ['NumberFilter', 'Detail', 'RequestFilter', "DeviceSerialNumberFilter", 'DeviceNameFilter', 'ApproverFilter', 'RequesterFilter', 'CurrentKeeperFilter', 'NextKeeperFilter', "BookingDateFilter", "DueDateFilter", 'RequestStatusFilter', 'select'];
   readonly pageSizeOptions: number[] = [10, 20, 50, 100];
   readonly dropdownOptions: { [key: string]: any } = { requestStatusList: [] }
   readonly keywordSuggestionOptions: { [key: string]: any } = {
@@ -75,6 +75,8 @@ export class RequestPageComponent implements OnInit {
     2: [],
     3: [],
     4: [],
+    5: [],
+    6: []
   }
   readonly statusOptions: { [key: string]: any } = {
     'REJECTED': 'badge text-bg-secondary p-2',
@@ -220,7 +222,7 @@ export class RequestPageComponent implements OnInit {
     this.requestService.updateRequestStatus(input).subscribe(
       res => {
         if (res) {
-          this.notification(message,'Close', 'success-snackbar');
+          this.notification(message, 'Close', 'success-snackbar');
           this.getRequestsWithPaging();
         }
       })
