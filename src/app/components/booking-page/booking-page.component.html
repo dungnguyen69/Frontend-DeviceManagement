@@ -438,25 +438,6 @@
             </th>
         </ng-container>
 
-        <ng-container matColumnDef="Action">
-            <th mat-header-cell *matHeaderCellDef>
-                <span>Action</span>
-            </th>
-            <td mat-cell *matCellDef="let row;let i=index">
-                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
-                    [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row, i)">
-                </mat-checkbox>
-            </td>
-        </ng-container>
-        <ng-container matColumnDef="select">
-            <th mat-header-cell *matHeaderCellDef>
-                <mat-checkbox (change)="$event ? toggleAllRows() : null"
-                    [checked]="selection.hasValue() && isAllSelected()"
-                    [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()">
-                </mat-checkbox>
-            </th>
-        </ng-container>
-
         <ng-container matColumnDef="Booking date">
             <th mat-header-cell *matHeaderCellDef>
                 <span>Booking date</span>

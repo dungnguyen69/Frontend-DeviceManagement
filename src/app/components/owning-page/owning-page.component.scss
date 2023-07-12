@@ -53,9 +53,6 @@ th.mat-header-cell,
 }
 
 mat-icon {
-    position: relative;
-    float: right;
-    top: -3px;
     cursor: pointer;
     color: rgba(0, 0, 0, 0.54);
 }
@@ -114,7 +111,6 @@ button {
     font-weight: bold;
     transition: transform .2s;
 }
-
 
 button:hover {
     transform: scale(1.2);

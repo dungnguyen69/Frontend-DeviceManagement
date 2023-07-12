@@ -420,6 +420,7 @@
                     <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
                         [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row, i)">
                     </mat-checkbox>
+                    <mat-icon (click)="updateReturnOwnedDevice(row)" class="detail-icon" *ngIf="row.KeeperNumber !== 0">assignment_return</mat-icon>
                 </td>
             </ng-container>
             <ng-container matColumnDef="select">

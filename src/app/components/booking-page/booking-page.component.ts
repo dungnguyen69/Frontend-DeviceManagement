@@ -70,9 +70,9 @@ export class BookingPageComponent implements OnInit {
     readonly columnsIndex = constants;
     readonly pageSizeOptions: number[] = [10, 20, 50, 100];
     readonly columns: string[] = ['Number', 'Detail', 'SerialNumber', 'DeviceName', 'Status', 'ItemType', 'PlatformName', 'PlatformVersion',
-        'RamSize', 'DisplaySize', 'StorageSize', 'InventoryNumber', 'Project', 'Origin', 'Owner', 'Keeper', 'Comments', "KeeperNumber", "Booking", "Booking date", "Due date", 'Action'];
+        'RamSize', 'DisplaySize', 'StorageSize', 'InventoryNumber', 'Project', 'Origin', 'Owner', 'Keeper', 'Comments', "KeeperNumber", "Booking", "Booking date", "Due date"];
     readonly columnFilters: string[] = ['NumberFilter', 'Update', 'SerialNumberFilter', 'DeviceNameFilter', 'StatusFilter', 'ItemTypeFilter', 'PlatformNameFilter', 'PlatformVersionFilter',
-        'RamSizeFilter', 'DisplaySizeFilter', 'StorageSizeFilter', 'InventoryNumberFilter', 'ProjectFilter', 'OriginFilter', 'OwnerFilter', 'KeeperFilter', 'CommentsFilter', "KeeperNumberFilter", 'book', "booking date", "due date", 'select'];
+        'RamSizeFilter', 'DisplaySizeFilter', 'StorageSizeFilter', 'InventoryNumberFilter', 'ProjectFilter', 'OriginFilter', 'OwnerFilter', 'KeeperFilter', 'CommentsFilter', "KeeperNumberFilter", 'book', "booking date", "due date"];
 
     /* Store filter options in an array*/
     readonly dropdownOptions: { [key: string]: any } = {
@@ -225,13 +225,13 @@ export class BookingPageComponent implements OnInit {
     }
 
     openDialogUpdate(rowId: number, tableIndex: number) {
-        let readOnly = !this.allowUpdate();
+        // let readOnly = !this.allowUpdate();
         this.dialog.open(UpdateDeviceComponent, {
             data: {
                 dataKey: rowId,
                 submit: true,
                 index: tableIndex,
-                readOnly: readOnly
+                readOnly: true
             }
         }).afterClosed().subscribe((result) => {
             if (result?.event == "Submit") {
@@ -371,11 +371,11 @@ export class BookingPageComponent implements OnInit {
         }
     }
 
-    private allowUpdate() {
-        if (this.isAdmin)
-            return true;
-        else if (this.isMod)
-            return true;
-        return false;
-    }
+    // private allowUpdate() {
+    //     if (this.isAdmin)
+    //         return true;
+    //     else if (this.isMod)
+    //         return true;
+    //     return false;
+    // }
 }

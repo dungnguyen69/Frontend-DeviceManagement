@@ -237,7 +237,7 @@ export class OwningPageComponent {
         readOnly: readOnly
       }
     }).afterClosed().subscribe((result) => {
-      if (result.event == "Submit") {
+      if (result?.event == "Submit") {
         this.refreshDataSourceWithoutFilter();
       }
     });
@@ -304,6 +304,16 @@ export class OwningPageComponent {
     this.getAllDevicesWithPagination();
   }
 
+  updateReturnOwnedDevice(row: any) {
+    console.log(row);
+    console.log(this.userId);
+    this.deviceService.updateReturnOwnedDevice(row.Id, this.userId).subscribe((data: any) => {
+      console.log(data.oldKeepers);
+      this.notification("UPDATED SUCCESSFULLY", 'Close', "success-snackbar")
+
+      this.getAllDevicesWithPagination();
+    })
+  }
   private downLoadFile(fileName: string, data: any, type: string) {
     let blob = new Blob([data], { type: type });
     let url = window.URL.createObjectURL(blob);

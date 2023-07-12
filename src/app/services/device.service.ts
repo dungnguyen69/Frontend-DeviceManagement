@@ -85,4 +85,11 @@ export class DeviceService {
       .forEach(([key, _]) => params = params.append(key, filteredValues[key]));
     return this.http.get(this.baseUrl + `api/devices/owners/${ownerId}`, { params: params });
   }
+
+  updateReturnOwnedDevice(deviceId: number, currentKeeperId: number): Observable<any> {
+    let inputs = { deviceId: deviceId, currentKeeperId: currentKeeperId}
+    console.log(inputs);
+    
+    return this.http.put(this.baseUrl + `api/devices/owners/return`, inputs, { headers });
+  }
 }

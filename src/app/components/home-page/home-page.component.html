@@ -20,12 +20,7 @@
             <button type="button" class="btn btn-secondary reset-filter" (click)="bookingPage.resetFilterValues()"
                 matTooltip="Rerset filter value(s)">Reset
                 filter</button>
-            <button type="button" class="btn btn-success" (click)="openDialogAddDevice()" matTooltip="Add a new device"
-                *ngIf="isMod || isAdmin">Add device</button>
-            <button type="button" class="btn btn-danger" matTooltip="Delete existing device(s)"
-                (click)="openConfirmationForDeletion()" *ngIf="isMod || isAdmin">Delete</button>
             <button type="button" class="btn btn-warning" (click)="exportDevice()">Export</button>
-            <button type="button" class="btn btn-dark" (click)="importDevice()" *ngIf="isMod || isAdmin">Import</button>
             <button type="button" class="btn btn-primary" (click)="submitting()" matBadge="{{totalBookingDevices}}"
                 matBadgePosition="after" matBadgeColor="accent">Submitting</button>
         </div>
