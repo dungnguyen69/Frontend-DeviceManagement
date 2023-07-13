@@ -65,8 +65,8 @@ export class RequestPageComponent implements OnInit {
     requestId: '', serialNumber: '', device: '', approver: '', currentKeeper: '', nextKeeper: '',
     requester: '', requestStatus: '', bookingDate: '', returnDate: ''
   };
-  readonly columns: string[] = ['Number', 'View', 'RequestId', "DeviceSerialNumber", 'DeviceName', 'Approver', 'Requester', 'CurrentKeeper', 'NextKeeper', "Booking date", "Due date", 'RequestStatus', 'Action'];
-  readonly columnFilters: string[] = ['NumberFilter', 'Detail', 'RequestFilter', "DeviceSerialNumberFilter", 'DeviceNameFilter', 'ApproverFilter', 'RequesterFilter', 'CurrentKeeperFilter', 'NextKeeperFilter', "BookingDateFilter", "DueDateFilter", 'RequestStatusFilter', 'select'];
+  readonly columns: string[] = ['Number', 'View', 'RequestId', "DeviceSerialNumber", 'DeviceName', 'Approver', 'Requester', 'CurrentKeeper', 'NextKeeper', "Date", 'RequestStatus', 'Action'];
+  readonly columnFilters: string[] = ['NumberFilter', 'Detail', 'RequestFilter', "DeviceSerialNumberFilter", 'DeviceNameFilter', 'ApproverFilter', 'RequesterFilter', 'CurrentKeeperFilter', 'NextKeeperFilter', "DateFilter", 'RequestStatusFilter', 'select'];
   readonly pageSizeOptions: number[] = [10, 20, 50, 100];
   readonly dropdownOptions: { [key: string]: any } = { requestStatusList: [] }
   readonly keywordSuggestionOptions: { [key: string]: any } = {
@@ -126,14 +126,11 @@ export class RequestPageComponent implements OnInit {
     this.getRequestsWithPaging();
   }
 
-  clearDate(dateColumn: number) {
-    if (dateColumn == this.BOOKING_DATE) {
-      this.filteredValues.bookingDate = ""
-    }
-    if (dateColumn == this.RETURN_DATE) {
-      this.filteredValues.returnDate = ""
-    }
-    this.dateFormControlnOptions[dateColumn].reset()
+  clearDate() {
+    this.dateFormControlnOptions[this.BOOKING_DATE].reset()
+    this.dateFormControlnOptions[this.RETURN_DATE].reset()
+    this.filteredValues.bookingDate = '';
+    this.filteredValues.returnDate = '';
     this.getRequestsWithPaging();
   }
 
@@ -151,7 +148,7 @@ export class RequestPageComponent implements OnInit {
     Object.entries(this.filteredValues).forEach(([key]: any) => {
       this.filteredValues[key] = "";
     });
-    this.getRequestsWithPaging();
+    this.clearDate();
   }
 
   checkRequestStatus(requestId: any, requestStatus: any) {
@@ -240,7 +237,6 @@ export class RequestPageComponent implements OnInit {
   private getRequestsWithPaging() {
     this.requestService.getRequestsWithPaging(this.user.id, this.pageSize!, this.pageIndex + 1, this.sortBy, this.sortDir, this.filteredValues)
       .subscribe((data: any) => {
-
         this.dataSource.data = data['requestsList'];
         this.dropdownOptions.requestStatusList = data['requestStatusList'];
         this.totalPages = data['totalPages'];

@@ -75,8 +75,8 @@
                 <div>
                     <mat-form-field appearance="outline">
                         <input type="text" [ngModel]="filteredValues.name" matInput
-                            (ngModelChange)="changeFilterInput($event,'name', columnsIndex.NAME)" [matAutocomplete]="auto"
-                            placeholder="Enter device name">
+                            (ngModelChange)="changeFilterInput($event,'name', columnsIndex.NAME)"
+                            [matAutocomplete]="auto" placeholder="Enter device name">
                         <mat-autocomplete #auto="matAutocomplete"
                             (optionSelected)="applyFilterForInputForm($event,'name')">
                             <mat-option *ngFor="let option of this.keywordSuggestionOptions[columnsIndex.NAME]"
@@ -222,8 +222,8 @@
                 <div>
                     <mat-form-field appearance="outline">
                         <input type="text" [ngModel]="filteredValues.screen" matInput
-                            (ngModelChange)="changeFilterInput($event,'screen',columnsIndex.SCREEN)" [matAutocomplete]="auto"
-                            placeholder="Enter display size">
+                            (ngModelChange)="changeFilterInput($event,'screen',columnsIndex.SCREEN)"
+                            [matAutocomplete]="auto" placeholder="Enter display size">
                         <mat-autocomplete #auto="matAutocomplete"
                             (optionSelected)="applyFilterForInputForm($event,'screen')">
                             <mat-option *ngFor="let option of this.keywordSuggestionOptions[columnsIndex.SCREEN]"
@@ -349,8 +349,8 @@
                 <div>
                     <mat-form-field appearance="outline">
                         <input type="text" [ngModel]="filteredValues.owner" matInput
-                            (ngModelChange)="changeFilterInput($event,'owner',columnsIndex.OWNER)" [matAutocomplete]="auto"
-                            placeholder="Enter owner">
+                            (ngModelChange)="changeFilterInput($event,'owner',columnsIndex.OWNER)"
+                            [matAutocomplete]="auto" placeholder="Enter owner">
                         <mat-autocomplete #auto="matAutocomplete"
                             (optionSelected)="applyFilterForInputForm($event,'owner')">
                             <mat-option *ngFor="let option of this.keywordSuggestionOptions[columnsIndex.OWNER]"
@@ -374,8 +374,8 @@
                 <div class="width-cell-filter-msmall">
                     <mat-form-field appearance="outline">
                         <input type="text" [ngModel]="filteredValues.keeper" matInput
-                            (ngModelChange)="changeFilterInput($event,'keeper',columnsIndex.KEEPER)" [matAutocomplete]="auto"
-                            placeholder="Enter keeper">
+                            (ngModelChange)="changeFilterInput($event,'keeper',columnsIndex.KEEPER)"
+                            [matAutocomplete]="auto" placeholder="Enter keeper">
                         <mat-autocomplete #auto="matAutocomplete"
                             (optionSelected)="applyFilterForInputForm($event,'keeper')">
                             <mat-option *ngFor="let option of this.keywordSuggestionOptions[columnsIndex.KEEPER]"
@@ -405,13 +405,14 @@
                 <span>Keeper Number</span>
             </th>
             <td mat-cell *matCellDef="let element">
-                <span [ngClass]="this.keeperNumberDisplay[element.KeeperNumber]" *ngIf="element.Status === 'VACANT' || (element.KeeperNumber <= 3 && element.Status === 'OCCUPIED')">{{element.KeeperNumber}}</span>
+                <span [ngClass]="this.keeperNumberDisplay[element.KeeperNumber]"
+                    *ngIf="element.Status === 'VACANT' || (element.KeeperNumber <= 3 && element.Status === 'OCCUPIED')">{{element.KeeperNumber}}</span>
             </td>
         </ng-container>
         <ng-container matColumnDef="KeeperNumberFilter">
             <th mat-header-cell *matHeaderCellDef class="width-cell-filter-msmall">
                 <div>
-                    <mat-form-field appearance="outline">
+                    <mat-form-field appearance="outline" class="drop-down">
                         <mat-select matNativeControl [(ngModel)]="filteredValues.keeperNo"
                             (ngModelChange)="applyFilterForDropdowns()">
                             <mat-option value="" selected style="background-color: white;">All</mat-option>
@@ -429,7 +430,8 @@
                 <span>Booking</span>
             </th>
             <td mat-cell *matCellDef="let row">
-                <mat-icon *ngIf="row.Status === 'VACANT' || (row.KeeperNumber < 3 && row.Status === 'OCCUPIED')" [ngClass]="handleBooking(row.Id)"
+                <mat-icon *ngIf="row.Status === 'VACANT' || (row.KeeperNumber < 3 && row.Status === 'OCCUPIED')"
+                    [ngClass]="handleBooking(row.Id)"
                     (click)="isClickable(row.Id) ? '': bookingDevices(row)">library_add</mat-icon>
             </td>
         </ng-container>
@@ -438,50 +440,35 @@
             </th>
         </ng-container>
 
-        <ng-container matColumnDef="Booking date">
+        <ng-container matColumnDef="Date">
             <th mat-header-cell *matHeaderCellDef>
-                <span>Booking date</span>
+                <span>Booking Date - Return date</span>
             </th>
-            <td mat-cell *matCellDef="let element"> {{element.BookingDate | date: 'longDate'}} </td>
+            <td mat-cell *matCellDef="let element">
+                <span *ngIf="element.KeeperNumber != 0"> {{element.BookingDate|
+                    date:'longDate'}} - {{element.ReturnDate | date: 'longDate'}}
+                </span>
+            </td>
         </ng-container>
-        <ng-container matColumnDef="booking date">
+        <ng-container matColumnDef="DateFilter">
             <th mat-header-cell *matHeaderCellDef class="width-cell-filter-msmall">
                 <mat-form-field class="example-form-field">
-                    <mat-label>Choose a date</mat-label>
-                    <input [matDatepicker]="datepicker" [formControl]="dateFormControlnOptions[BOOKING_DATE]" matInput>
-                    <mat-icon matDatepickerToggleIcon (click)="clearDate(BOOKING_DATE)">clear</mat-icon>
-                    <mat-datepicker-toggle matSuffix [for]="datepicker"
-                        matTooltip="Pick a date being less than all booking dates"></mat-datepicker-toggle>
-                    <mat-datepicker #datepicker>
-                        <mat-datepicker-actions>
-                            <button mat-button matDatepickerCancel>Cancel</button>
-                            <button mat-raised-button color="primary" matDatepickerApply>Apply</button>
-                        </mat-datepicker-actions>
-                    </mat-datepicker>
-                </mat-form-field>
-            </th>
-        </ng-container>
-
-        <ng-container matColumnDef="Due date">
-            <th mat-header-cell *matHeaderCellDef>
-                <span>Due date</span>
-            </th>
-            <td mat-cell *matCellDef="let element"> {{element.ReturnDate | date: 'longDate'}} </td>
-        </ng-container>
-        <ng-container matColumnDef="due date">
-            <th mat-header-cell *matHeaderCellDef class="width-cell-filter-msmall">
-                <mat-form-field class="example-form-field">
-                    <mat-label>Choose a date</mat-label>
-                    <input [matDatepicker]="datepicker" [formControl]="dateFormControlnOptions[RETURN_DATE]" matInput>
-                    <mat-icon matDatepickerToggleIcon (click)="clearDate(RETURN_DATE)">clear</mat-icon>
-                    <mat-datepicker-toggle matSuffix [for]="datepicker"
-                        matTooltip="Pick a date being greater than all due dates"></mat-datepicker-toggle>
-                    <mat-datepicker #datepicker>
-                        <mat-datepicker-actions>
-                            <button mat-button matDatepickerCancel>Cancel</button>
-                            <button mat-raised-button color="primary" matDatepickerApply>Apply</button>
-                        </mat-datepicker-actions>
-                    </mat-datepicker>
+                    <mat-date-range-input [rangePicker]="rangePicker">
+                        <input matStartDate placeholder="Booking date"
+                            [formControl]="dateFormControlnOptions[BOOKING_DATE]">
+                        <input matEndDate placeholder="Return date" [formControl]="dateFormControlnOptions[RETURN_DATE]">
+                    </mat-date-range-input>
+                    <mat-datepicker-toggle matIconSuffix [for]="rangePicker">
+                    </mat-datepicker-toggle>
+                    <mat-datepicker-toggle matSuffix (click)="clearDate()">
+                        <mat-icon matDatepickerToggleIcon>clear</mat-icon>
+                    </mat-datepicker-toggle>
+                    <mat-date-range-picker #rangePicker>
+                        <mat-date-range-picker-actions>
+                            <button mat-button matDateRangePickerCancel>Cancel</button>
+                            <button mat-raised-button color="primary" matDateRangePickerApply>Apply</button>
+                        </mat-date-range-picker-actions>
+                    </mat-date-range-picker>
                 </mat-form-field>
             </th>
         </ng-container>

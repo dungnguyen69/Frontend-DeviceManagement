@@ -1,0 +1,121 @@
+.example-container {
+    max-width: 100%;
+    overflow: auto;
+    max-height: 100%;
+}
+
+table,
+td,
+th {
+    border: 0.5px solid rgb(143, 143, 143);
+}
+
+th,
+td,
+tr {
+    text-align: center !important;
+}
+
+:host ::ng-deep .mat-sort-header-container {
+    display: inline-flex !important;
+    justify-content: center;
+}
+
+:host ::ng-deep .mat-mdc-paginator-outer-container {
+    background-color: aquamarine;
+}
+
+:host ::ng-deep .mat-mdc-form-field {
+    --mat-mdc-form-field-floating-label-scale: 0.75;
+    display: inline-flex;
+    flex-direction: initial !important;
+    min-width: 0;
+    text-align: center;
+}
+
+
+:host ::ng-deep .mat-mdc-header-cell,
+th.mat-header-cell,
+:host ::ng-deep .mat-mdc-form-field-input-control {
+    text-align: center;
+}
+
+:host ::ng-deep.mat-mdc-form-field-subscript-wrapper {
+    width: 0%;
+}
+
+:host::ng-deep.mat-mdc-text-field-wrapper {
+    background-color: white;
+}
+
+.mat-datepicker-input {
+    width: 85%;
+}
+
+mat-icon {
+    cursor: pointer;
+    color: rgba(0, 0, 0, 0.54);
+}
+
+.detail-icon {
+    transition: transform .2s;
+    color: black;
+}
+
+.detail-icon:hover {
+    color: aquamarine;
+    transform: scale(1.5);
+}
+
+.first-header-row {
+    background-color: #212529;
+}
+
+th span {
+    color: white;
+    font-weight: bold;
+}
+
+::ng-deep .mat-sort-header-container:not(.mat-sort-header-sorted) .mat-sort-header-arrow {
+    opacity: 1 !important;
+    transform: none !important;
+}
+
+.highlight {
+    background-color: #a8d4ab !important;
+}
+
+.highlight:hover {
+    @extend .highlight;
+}
+
+.header-section {
+    margin-bottom: 20px;
+    padding-top: 20px;
+    display: flex;
+}
+
+.header-title {
+    text-align: center;
+    margin-left: 20px;
+    font-weight: bold;
+}
+
+.reset-filter {
+    @extend button;
+    margin-left: auto;
+}
+
+button {
+    margin-right: 50px;
+    font-weight: bold;
+    transition: transform .2s;
+}
+
+button:hover {
+    transform: scale(1.2);
+}
+
+:host::ng-deep.mat-mdc-form-field-icon-suffix {
+    display:ruby;
+}

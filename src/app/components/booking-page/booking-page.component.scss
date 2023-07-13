@@ -52,6 +52,10 @@ th.mat-header-cell,
     width: 85%;
 }
 
+.example-form-field {
+    margin-right: 20px;
+}
+
 mat-icon {
     position: relative;
     float: right;
@@ -94,9 +98,12 @@ th span {
 
 .highlight {
     background-color: #a8d4ab !important;
-    /* green */
 }
 
 .highlight:hover {
     @extend .highlight;
-  }
+}
+
+:host::ng-deep.mat-mdc-form-field-icon-suffix {
+    display:ruby;
+}

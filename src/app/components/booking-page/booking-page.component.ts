@@ -70,9 +70,9 @@ export class BookingPageComponent implements OnInit {
     readonly columnsIndex = constants;
     readonly pageSizeOptions: number[] = [10, 20, 50, 100];
     readonly columns: string[] = ['Number', 'Detail', 'SerialNumber', 'DeviceName', 'Status', 'ItemType', 'PlatformName', 'PlatformVersion',
-        'RamSize', 'DisplaySize', 'StorageSize', 'InventoryNumber', 'Project', 'Origin', 'Owner', 'Keeper', 'Comments', "KeeperNumber", "Booking", "Booking date", "Due date"];
+        'RamSize', 'DisplaySize', 'StorageSize', 'InventoryNumber', 'Project', 'Origin', 'Owner', 'Keeper', 'Comments', "KeeperNumber", "Booking", "Date"];
     readonly columnFilters: string[] = ['NumberFilter', 'Update', 'SerialNumberFilter', 'DeviceNameFilter', 'StatusFilter', 'ItemTypeFilter', 'PlatformNameFilter', 'PlatformVersionFilter',
-        'RamSizeFilter', 'DisplaySizeFilter', 'StorageSizeFilter', 'InventoryNumberFilter', 'ProjectFilter', 'OriginFilter', 'OwnerFilter', 'KeeperFilter', 'CommentsFilter', "KeeperNumberFilter", 'book', "booking date", "due date"];
+        'RamSizeFilter', 'DisplaySizeFilter', 'StorageSizeFilter', 'InventoryNumberFilter', 'ProjectFilter', 'OriginFilter', 'OwnerFilter', 'KeeperFilter', 'CommentsFilter', "KeeperNumberFilter", 'book', "DateFilter"];
 
     /* Store filter options in an array*/
     readonly dropdownOptions: { [key: string]: any } = {
@@ -170,14 +170,11 @@ export class BookingPageComponent implements OnInit {
         this.getAllDevicesWithPagination();
     }
 
-    clearDate(dateColumn: number) {
-        if (dateColumn == this.BOOKING_DATE) {
-            this.filteredValues.bookingDate = ""
-        }
-        if (dateColumn == this.RETURN_DATE) {
-            this.filteredValues.returnDate = ""
-        }
-        this.dateFormControlnOptions[dateColumn].reset()
+    clearDate() {
+        this.dateFormControlnOptions[this.BOOKING_DATE].reset()
+        this.dateFormControlnOptions[this.RETURN_DATE].reset()
+        this.filteredValues.bookingDate = '';
+        this.filteredValues.returnDate = '';
         this.getAllDevicesWithPagination();
     }
 
@@ -221,7 +218,7 @@ export class BookingPageComponent implements OnInit {
         Object.entries(this.filteredValues).forEach(([key]: any) => {
             this.filteredValues[key] = "";
         });
-        this.getAllDevicesWithPagination();
+        this.clearDate()
     }
 
     openDialogUpdate(rowId: number, tableIndex: number) {

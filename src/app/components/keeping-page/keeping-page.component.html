@@ -1,1 +1,490 @@
-<p>keeping-page works!</p>
+<body style="background-color:aquamarine">
+    <div class="header-section">
+        <h2 class="header-title">Keeping</h2>
+        <button type="button" class="btn btn-secondary reset-filter" (click)="resetFilterValues()"
+            matTooltip="Rerset filter value(s)">Reset
+            filter</button>
+    </div>
+
+    <section class="example-container mat-elevation-z8 border" tabindex="0">
+        <table mat-table [dataSource]="dataSource" matTableExporter matSort (matSortChange)="sortData($event)">
+            <ng-container matColumnDef="Number" *ngIf="(sortDir == 'desc' && sortBy == 'id'); else asc">
+                <th mat-header-cell *matHeaderCellDef class="noborder" mat-sort-header="id">
+                    <span>No.</span>
+                </th>
+                <td mat-cell *matCellDef="let element;let i=index"> {{pageSize * (pageIndex)+i+1}}</td>
+            </ng-container>
+
+            <ng-template #asc>
+                <ng-container matColumnDef="Number">
+                    <th mat-header-cell *matHeaderCellDef class="noborder" mat-sort-header="id">
+                        <span>No.</span>
+                    </th>
+                    <td mat-cell *matCellDef="let element;let i=index"> {{size - (pageSize * (pageIndex)+i)}}</td>
+                </ng-container>
+            </ng-template>
+            <ng-container matColumnDef="NumberFilter">
+                <th mat-header-cell *matHeaderCellDef>
+                    <div class="width-cell-filter-msmall">
+                    </div>
+                </th>
+            </ng-container>
+
+            <ng-container matColumnDef="Detail">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Detail</span>
+                </th>
+                <td mat-cell *matCellDef="let row;let i=index">
+                    <mat-icon (click)="openDialogUpdate(row.Id,i+1)" class="detail-icon">pageview</mat-icon>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="Update">
+                <th mat-header-cell *matHeaderCellDef>
+                </th>
+            </ng-container>
+
+            <ng-container matColumnDef="SerialNumber">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="serialNumber">
+                    <span>Serial Number</span>
+                </th>
+                <td mat-cell *matCellDef="let element"> {{element.SerialNumber}} </td>
+            </ng-container>
+            <ng-container matColumnDef="SerialNumberFilter">
+                <th mat-header-cell *matHeaderCellDef class="width-cell-filter-msmall">
+                    <div>
+                        <mat-form-field appearance="outline">
+                            <input type="text" [ngModel]="filteredValues.serialNumber" matInput
+                                (ngModelChange)="changeFilterInput($event,'serialNumber', columnsIndex.SERIAL_NUMBER)"
+                                [matAutocomplete]="auto" placeholder="Enter serial number">
+                            <mat-autocomplete #auto="matAutocomplete"
+                                (optionSelected)="applyFilterForInputForm($event,'serialNumber')">
+                                <mat-option
+                                    *ngFor="let option of this.keywordSuggestionOptions[columnsIndex.SERIAL_NUMBER]"
+                                    [value]="option">
+                                    {{option}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                    </div>
+                </th>
+            </ng-container>
+
+            <ng-container matColumnDef="DeviceName">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="name">
+                    <span>Device Name</span>
+                </th>
+                <td mat-cell *matCellDef="let element"> {{element.DeviceName}} </td>
+            </ng-container>
+            <ng-container matColumnDef="DeviceNameFilter">
+                <th mat-header-cell *matHeaderCellDef class="width-cell-filter-msmall">
+                    <div>
+                        <mat-form-field appearance="outline">
+                            <input type="text" [ngModel]="filteredValues.name" matInput
+                                (ngModelChange)="changeFilterInput($event,'name', columnsIndex.NAME)"
+                                [matAutocomplete]="auto" placeholder="Enter device name">
+                            <mat-autocomplete #auto="matAutocomplete"
+                                (optionSelected)="applyFilterForInputForm($event,'name')">
+                                <mat-option *ngFor="let option of this.keywordSuggestionOptions[columnsIndex.NAME]"
+                                    [value]="option">
+                                    {{option}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                    </div>
+                </th>
+            </ng-container>
+
+            <ng-container matColumnDef="Status">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Status</span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <span [ngClass]="this.statusOptions[element.Status]">{{element.Status}}</span>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="StatusFilter">
+                <th mat-header-cell *matHeaderCellDef class="width-cell-filter-msmall">
+                    <div>
+                        <mat-form-field appearance="outline">
+                            <mat-select matNativeControl [(ngModel)]="filteredValues.status"
+                                (ngModelChange)="applyFilterForDropdowns()">
+                                <mat-option value="" selected style="background-color: white;">All</mat-option>
+                                <mat-option *ngFor="let status of dropdownOptions.status" [value]="status">
+                                    {{status}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </th>
+            </ng-container>
+
+            <ng-container matColumnDef="ItemType">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Item Type</span>
+                </th>
+                <td mat-cell *matCellDef="let element"> {{element.ItemType}} </td>
+            </ng-container>
+            <ng-container matColumnDef="ItemTypeFilter">
+                <th mat-header-cell *matHeaderCellDef class="width-cell-filter-msmall">
+                    <div>
+                        <mat-form-field appearance="outline">
+                            <mat-select matNativeControl [(ngModel)]="filteredValues.itemType"
+                                (ngModelChange)="applyFilterForDropdowns()">
+                                <mat-option value="" selected>All</mat-option>
+                                <mat-option *ngFor="let item of dropdownOptions.itemType" [value]="item">
+                                    {{item}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </th>
+            </ng-container>
+
+            <ng-container matColumnDef="PlatformName">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Platform Name</span>
+                </th>
+                <td mat-cell *matCellDef="let element"> {{element.PlatformName}} </td>
+            </ng-container>
+            <ng-container matColumnDef="PlatformNameFilter">
+                <th mat-header-cell *matHeaderCellDef class="width-cell-filter-msmall">
+                    <div>
+                        <mat-form-field appearance="outline">
+                            <input type="text" [ngModel]="filteredValues.platformName" matInput
+                                (ngModelChange)="changeFilterInput($event,'platformName',columnsIndex.PLATFORM_NAME)"
+                                [matAutocomplete]="auto" placeholder="Enter platform name">
+                            <mat-autocomplete #auto="matAutocomplete"
+                                (optionSelected)="applyFilterForInputForm($event,'platformName')">
+                                <mat-option
+                                    *ngFor="let option of this.keywordSuggestionOptions[columnsIndex.PLATFORM_NAME]"
+                                    [value]="option">
+                                    {{option}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                    </div>
+                </th>
+            </ng-container>
+
+            <ng-container matColumnDef="PlatformVersion">
+                <th mat-header-cell *matHeaderCellDef class="width-cell-filter-msmall">
+                    <span>Platform Version</span>
+                </th>
+                <td mat-cell *matCellDef="let element"> {{element.PlatformVersion}} </td>
+            </ng-container>
+            <ng-container matColumnDef="PlatformVersionFilter">
+                <th mat-header-cell *matHeaderCellDef>
+                    <div>
+                        <mat-form-field appearance="outline">
+                            <input type="text" [ngModel]="filteredValues.platformVersion" matInput
+                                (ngModelChange)="changeFilterInput($event,'platformVersion',columnsIndex.PLATFORM_VERSION)"
+                                [matAutocomplete]="auto" placeholder="Enter platform version">
+                            <mat-autocomplete #auto="matAutocomplete"
+                                (optionSelected)="applyFilterForInputForm($event,'platformVersion')">
+                                <mat-option
+                                    *ngFor="let option of this.keywordSuggestionOptions[columnsIndex.PLATFORM_VERSION]"
+                                    [value]="option">
+                                    {{option}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                    </div>
+                </th>
+            </ng-container>
+
+            <ng-container matColumnDef="RamSize">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Ram Size</span>
+                </th>
+                <td mat-cell *matCellDef="let element"> {{element.RamSize}} </td>
+            </ng-container>
+            <ng-container matColumnDef="RamSizeFilter">
+                <th mat-header-cell *matHeaderCellDef class="width-cell-filter-msmall">
+                    <div>
+                        <mat-form-field appearance="outline">
+                            <input type="text" [ngModel]="filteredValues.ram" matInput
+                                (ngModelChange)="changeFilterInput($event,'ram',columnsIndex.RAM)"
+                                [matAutocomplete]="auto" placeholder="Enter ram size">
+                            <mat-autocomplete #auto="matAutocomplete"
+                                (optionSelected)="applyFilterForInputForm($event,'ram')">
+                                <mat-option *ngFor="let option of this.keywordSuggestionOptions[columnsIndex.RAM]"
+                                    [value]="option">
+                                    {{option}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                    </div>
+                </th>
+            </ng-container>
+
+            <ng-container matColumnDef="DisplaySize">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Display Size</span>
+                </th>
+                <td mat-cell *matCellDef="let element"> {{element.ScreenSize}} </td>
+            </ng-container>
+            <ng-container matColumnDef="DisplaySizeFilter">
+                <th mat-header-cell *matHeaderCellDef class="width-cell-filter-msmall">
+                    <div>
+                        <mat-form-field appearance="outline">
+                            <input type="text" [ngModel]="filteredValues.screen" matInput
+                                (ngModelChange)="changeFilterInput($event,'screen',columnsIndex.SCREEN)"
+                                [matAutocomplete]="auto" placeholder="Enter display size">
+                            <mat-autocomplete #auto="matAutocomplete"
+                                (optionSelected)="applyFilterForInputForm($event,'screen')">
+                                <mat-option *ngFor="let option of this.keywordSuggestionOptions[columnsIndex.SCREEN]"
+                                    [value]="option">
+                                    {{option}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                    </div>
+                </th>
+            </ng-container>
+
+            <ng-container matColumnDef="StorageSize">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Storage Size</span>
+                </th>
+                <td mat-cell *matCellDef="let element"> {{element.StorageSize}} </td>
+            </ng-container>
+            <ng-container matColumnDef="StorageSizeFilter">
+                <th mat-header-cell *matHeaderCellDef class="width-cell-filter-msmall">
+                    <div>
+                        <mat-form-field appearance="outline">
+                            <input type="text" [ngModel]="filteredValues.storage" matInput
+                                (ngModelChange)="changeFilterInput($event,'storage',columnsIndex.STORAGE)"
+                                [matAutocomplete]="auto" placeholder="Enter storage size">
+                            <mat-autocomplete #auto="matAutocomplete"
+                                (optionSelected)="applyFilterForInputForm($event,'storage')">
+                                <mat-option *ngFor="let option of this.keywordSuggestionOptions[columnsIndex.STORAGE]"
+                                    [value]="option">
+                                    {{option}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                    </div>
+                </th>
+            </ng-container>
+
+            <ng-container matColumnDef="InventoryNumber">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="inventoryNumber">
+                    <span>Inventory Number</span>
+                </th>
+                <td mat-cell *matCellDef="let element"> {{element.InventoryNumber}} </td>
+            </ng-container>
+            <ng-container matColumnDef="InventoryNumberFilter">
+                <th mat-header-cell *matHeaderCellDef class="width-cell-filter-msmall">
+                    <div>
+                        <mat-form-field appearance="outline">
+                            <input type="text" [ngModel]="filteredValues.inventoryNumber" matInput
+                                (ngModelChange)="changeFilterInput($event,'inventoryNumber',columnsIndex.INVENTORY_NUMBER)"
+                                [matAutocomplete]="auto" placeholder="Enter inventory number">
+                            <mat-autocomplete #auto="matAutocomplete"
+                                (optionSelected)="applyFilterForInputForm($event,'inventoryNumber')">
+                                <mat-option
+                                    *ngFor="let option of this.keywordSuggestionOptions[columnsIndex.INVENTORY_NUMBER]"
+                                    [value]="option">
+                                    {{option}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                    </div>
+                </th>
+            </ng-container>
+
+
+            <ng-container matColumnDef="Project">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Project</span>
+                </th>
+                <td mat-cell *matCellDef="let element"> {{element.Project}} </td>
+            </ng-container>
+            <ng-container matColumnDef="ProjectFilter">
+                <th mat-header-cell *matHeaderCellDef class="width-cell-filter-msmall">
+                    <div>
+                        <mat-form-field appearance="outline">
+                            <mat-select matNativeControl [(ngModel)]="filteredValues.project"
+                                (ngModelChange)="applyFilterForDropdowns()">
+                                <mat-option value="" selected>All</mat-option>
+                                <mat-option *ngFor="let project of dropdownOptions.project" [value]="project">
+                                    {{project}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </th>
+            </ng-container>
+
+
+            <ng-container matColumnDef="Origin">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Origin</span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <span class="badge rounded-pill bg-primary p-2"
+                        *ngIf="element.origin == 'TMA'; else nonTma">{{element.Origin}}</span>
+                    <ng-template #nonTma> <span
+                            class="badge rounded-pill bg-success p-2">{{element.Origin}}</span></ng-template>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="OriginFilter">
+                <th mat-header-cell *matHeaderCellDef class="width-cell-filter-msmall">
+                    <div>
+                        <mat-form-field appearance="outline">
+                            <mat-select matNativeControl [(ngModel)]="filteredValues.origin"
+                                (ngModelChange)="applyFilterForDropdowns()">
+                                <mat-option value="" selected>All</mat-option>
+                                <mat-option *ngFor="let origin of dropdownOptions.origin" [value]="origin">
+                                    {{origin}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </th>
+            </ng-container>
+
+            <ng-container matColumnDef="Owner">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Owner</span>
+                </th>
+                <td mat-cell *matCellDef="let element"> {{element.Owner}} </td>
+            </ng-container>
+            <ng-container matColumnDef="OwnerFilter">
+                <th mat-header-cell *matHeaderCellDef class="width-cell-filter-msmall">
+                    <div>
+                        <mat-form-field appearance="outline">
+                            <input type="text" [ngModel]="filteredValues.owner" matInput
+                                (ngModelChange)="changeFilterInput($event,'owner',columnsIndex.OWNER)" [matAutocomplete]="auto"
+                                placeholder="Enter owner">
+                            <mat-autocomplete #auto="matAutocomplete"
+                                (optionSelected)="applyFilterForInputForm($event,'owner')">
+                                <mat-option *ngFor="let option of this.keywordSuggestionOptions[columnsIndex.OWNER]"
+                                    [value]="option">
+                                    {{option}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                    </div>
+                </th>
+            </ng-container>
+
+            <ng-container matColumnDef="Keeper">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Keeper</span>
+                </th>
+                <td mat-cell *matCellDef="let element"> {{element.Keeper}} </td>
+            </ng-container>
+            <ng-container matColumnDef="KeeperFilter">
+                <th mat-header-cell *matHeaderCellDef>
+                    <div class="width-cell-filter-msmall">
+                        <mat-form-field appearance="outline">
+                            <input type="text" [ngModel]="filteredValues.keeper" matInput
+                                (ngModelChange)="changeFilterInput($event,'keeper',columnsIndex.KEEPER)"
+                                [matAutocomplete]="auto" placeholder="Enter keeper">
+                            <mat-autocomplete #auto="matAutocomplete"
+                                (optionSelected)="applyFilterForInputForm($event,'keeper')">
+                                <mat-option *ngFor="let option of this.keywordSuggestionOptions[columnsIndex.KEEPER]"
+                                    [value]="option">
+                                    {{option}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+
+                    </div>
+                </th>
+            </ng-container>
+
+            <ng-container matColumnDef="Comments">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Comments</span>
+                </th>
+                <td mat-cell *matCellDef="let element"> {{element.comments}} </td>
+            </ng-container>
+            <ng-container matColumnDef="CommentsFilter">
+                <th mat-header-cell *matHeaderCellDef class="width-cell-filter-msmall">
+                </th>
+            </ng-container>
+
+            <ng-container matColumnDef="KeeperNumber">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Keeper Number</span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <span [ngClass]="this.keeperNumberDisplay[element.KeeperNo]"
+                        *ngIf="element.Status === 'VACANT' || (element.KeeperNo <= 3 && element.Status === 'OCCUPIED')">{{element.KeeperNo}}</span>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="KeeperNumberFilter">
+                <th mat-header-cell *matHeaderCellDef class="width-cell-filter-msmall">
+                    <div>
+                        <mat-form-field appearance="outline">
+                            <mat-select matNativeControl [(ngModel)]="filteredValues.keeperNo"
+                                (ngModelChange)="applyFilterForDropdowns()">
+                                <mat-option value="" selected style="background-color: white;">All</mat-option>
+                                <mat-option *ngFor="let option of dropdownOptions.keeperNumberOptions" [value]="option">
+                                    {{option}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </th>
+            </ng-container>
+
+            <ng-container matColumnDef="Date">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Booking Date - Return date</span>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <span *ngIf="element.KeeperNumber != 0"> {{element.BookingDate|
+                        date:'longDate'}} - {{element.ReturnDate | date: 'longDate'}}
+                    </span>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="DateFilter">
+                <th mat-header-cell *matHeaderCellDef class="width-cell-filter-msmall">
+                    <mat-form-field class="example-form-field">
+                        <mat-date-range-input [rangePicker]="rangePicker">
+                            <input matStartDate placeholder="Booking date"
+                                [formControl]="dateFormControlnOptions[BOOKING_DATE]">
+                            <input matEndDate placeholder="Return date" [formControl]="dateFormControlnOptions[RETURN_DATE]">
+                        </mat-date-range-input>
+                        <mat-datepicker-toggle matIconSuffix [for]="rangePicker">
+                        </mat-datepicker-toggle>
+                        <mat-datepicker-toggle matSuffix (click)="clearDate()">
+                            <mat-icon matDatepickerToggleIcon>clear</mat-icon>
+                        </mat-datepicker-toggle>
+                        <mat-date-range-picker #rangePicker>
+                            <mat-date-range-picker-actions>
+                                <button mat-button matDateRangePickerCancel>Cancel</button>
+                                <button mat-raised-button color="primary" matDateRangePickerApply>Apply</button>
+                            </mat-date-range-picker-actions>
+                        </mat-date-range-picker>
+                    </mat-form-field>
+                </th>
+            </ng-container>
+
+            <ng-container matColumnDef="Action">
+                <th mat-header-cell *matHeaderCellDef>
+                    <span>Action</span>
+                </th>
+                <td mat-cell *matCellDef="let row;let i=index">
+                    <mat-icon (click)="updateReturnKeepingDevice(row)" class="detail-icon"
+                        *ngIf="row.KeeperNumber !== 0">assignment_return</mat-icon>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="select">
+                <th mat-header-cell *matHeaderCellDef></th>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="columns" class="first-header-row"></tr>
+            <tr mat-row *matRowDef="let row; columns: columns;"
+                [ngClass]="{'highlight': this.selection.selected.includes(row)}"></tr>
+            <tr mat-header-row *matHeaderRowDef="columnFilters" class="second-header-row"></tr>
+
+        </table>
+    </section>
+    <mat-paginator class="paginator" [length]="size" [pageSizeOptions]="pageSizeOptions" [pageIndex]="pageIndex"
+        [pageSize]="pageSize" aria-label="Select" (page)="handlePagination($event)">
+    </mat-paginator>
+</body>

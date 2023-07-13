@@ -116,3 +116,7 @@ th span{
     color: white;
     font-weight: bold;
 }
+
+:host::ng-deep.mat-mdc-form-field-icon-suffix {
+    display:ruby;
+}

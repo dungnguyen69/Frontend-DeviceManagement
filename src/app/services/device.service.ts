@@ -35,7 +35,7 @@ export class DeviceService {
     Object.entries(filteredValues)
       .filter(([_, value]) => value != "")
       .forEach(([key, _]) => params = params.append(key, filteredValues[key]));
-    return this.http.get<String[]>(this.baseUrl + 'api/devices/warehouse/suggestion', { params: params });
+    return this.http.get(this.baseUrl + 'api/devices/warehouse/suggestion', { params: params });
   }
 
   getDropDownValues(): Observable<any> {
@@ -43,11 +43,11 @@ export class DeviceService {
   }
 
   addDevice(filteredValues: any): Observable<any> {
-    return this.http.post<String[]>(this.baseUrl + 'api/devices/warehouse', filteredValues, config);
+    return this.http.post(this.baseUrl + 'api/devices/warehouse', filteredValues, config);
   }
 
   updateDevice(rowId: number, device: any): Observable<any> {
-    return this.http.put<String[]>(this.baseUrl + `api/devices/warehouse/${rowId}`, device, config);
+    return this.http.put(this.baseUrl + `api/devices/warehouse/${rowId}`, device, config);
   }
 
   deleteDevice(rowId: number): Observable<any> {
@@ -87,7 +87,44 @@ export class DeviceService {
   }
 
   updateReturnOwnedDevice(deviceId: number, currentKeeperId: number): Observable<any> {
-    let inputs = { deviceId: deviceId, currentKeeperId: currentKeeperId}
+    let inputs = { deviceId: deviceId, currentKeeperId: currentKeeperId }
     return this.http.put(this.baseUrl + `api/devices/owners/return`, inputs, { headers });
+  }
+
+  updateReturnKeepingdDevice(deviceId: number, currentKeeperId: number, keeperNumber: number): Observable<any> {
+    let inputs = { deviceId: deviceId, currentKeeperId: currentKeeperId, keeperNo: keeperNumber }
+    return this.http.put(this.baseUrl + `api/devices/keepers/return`, inputs, { headers });
+  }
+
+  suggestKeywordForKeeperPage(keeperId: number, column: number, keyword: string, filteredValues?: any): Observable<any> {
+    let params = new HttpParams();
+    params = params.append('column', column);
+    params = params.append('keyword', keyword);
+    Object.entries(filteredValues)
+      .filter(([_, value]) => value != "")
+      .forEach(([key, _]) => params = params.append(key, filteredValues[key]));
+    return this.http.get(this.baseUrl + `api/devices/keepers/suggestion/${keeperId}`, { params: params });
+  }
+
+  suggestKeywordForOwnerPage(ownerId: number, column: number, keyword: string, filteredValues?: any): Observable<any> {
+    let params = new HttpParams();
+    params = params.append('column', column);
+    params = params.append('keyword', keyword);
+    Object.entries(filteredValues)
+      .filter(([_, value]) => value != "")
+      .forEach(([key, _]) => params = params.append(key, filteredValues[key]));
+    return this.http.get(this.baseUrl + `api/devices/owners/suggestion/${ownerId}`, { params: params });
+  }
+
+  getAllKeepingDevicesWithPagination(keeperId: number, pageSize: number, pageNo: number, sortBy: string, sortDir: string, filteredValues?: any): Observable<any> {
+    let params = new HttpParams();
+    params = params.append('pageSize', pageSize);
+    params = params.append('pageNo', pageNo);
+    params = params.append('sortBy', sortBy);
+    params = params.append('sortDir', sortDir);
+    Object.entries(filteredValues)
+      .filter(([_, value]) => value != "")
+      .forEach(([key, _]) => params = params.append(key, filteredValues[key]));
+    return this.http.get(this.baseUrl + `api/devices/keepers/${keeperId}`, { params: params });
   }
 }

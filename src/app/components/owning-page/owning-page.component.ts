@@ -7,7 +7,6 @@ import { Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { IDevice } from 'src/app/models/IDevice';
 import { DeviceService } from 'src/app/services/device.service';
-import { LocalService } from 'src/app/services/local.service';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
 import { constants } from 'src/app/utils/constant';
 import { UpdateDeviceComponent } from '../update-device/update-device.component';
@@ -47,16 +46,16 @@ export class OwningPageComponent {
   addUnsuccessful: string;
   filteredValues: { [key: string]: string } = {
     name: '', status: '', platformName: '', platformVersion: '',
-    itemType: '', ram: '', screen: '', storage: '', owner: '',
+    itemType: '', ram: '', screen: '', storage: '',
     keeper: '', keeperNo: '', inventoryNumber: '', serialNumber: '', origin: '', project: '', bookingDate: '', returnDate: ''
   };
 
   readonly columnsIndex = constants;
   readonly pageSizeOptions: number[] = [10, 20, 50, 100];
   readonly columns: string[] = ['Number', 'Detail', 'SerialNumber', 'DeviceName', 'Status', 'ItemType', 'PlatformName', 'PlatformVersion',
-    'RamSize', 'DisplaySize', 'StorageSize', 'InventoryNumber', 'Project', 'Origin', 'Keeper', 'Comments', "KeeperNumber", "Booking date", "Due date", 'Action'];
+    'RamSize', 'DisplaySize', 'StorageSize', 'InventoryNumber', 'Project', 'Origin', 'Keeper', 'Comments', "KeeperNumber", "Date", 'Action'];
   readonly columnFilters: string[] = ['NumberFilter', 'Update', 'SerialNumberFilter', 'DeviceNameFilter', 'StatusFilter', 'ItemTypeFilter', 'PlatformNameFilter', 'PlatformVersionFilter',
-    'RamSizeFilter', 'DisplaySizeFilter', 'StorageSizeFilter', 'InventoryNumberFilter', 'ProjectFilter', 'OriginFilter', 'KeeperFilter', 'CommentsFilter', "KeeperNumberFilter", "booking date", "due date", 'select'];
+    'RamSizeFilter', 'DisplaySizeFilter', 'StorageSizeFilter', 'InventoryNumberFilter', 'ProjectFilter', 'OriginFilter', 'KeeperFilter', 'CommentsFilter', "KeeperNumberFilter", "DateFilter", 'select'];
 
   /* Store filter options in an array*/
   readonly dropdownOptions: { [key: string]: any } = {
@@ -247,7 +246,7 @@ export class OwningPageComponent {
     const filterValue: string = keyword.toLowerCase();
     if (filterValue.trim().length !== 0)
       this.deviceService
-        .suggest(column, filterValue, this.filteredValues)
+        .suggestKeywordForOwnerPage(this.userId, column, filterValue, this.filteredValues)
         .subscribe((data: any) => {
           this.keywordSuggestionOptions[column] = data['keywordList'];
         });
@@ -275,14 +274,11 @@ export class OwningPageComponent {
     return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${index}`;
   }
 
-  clearDate(dateColumn: number) {
-    if (dateColumn == this.BOOKING_DATE) {
-      this.filteredValues.bookingDate = ""
-    }
-    if (dateColumn == this.RETURN_DATE) {
-      this.filteredValues.returnDate = ""
-    }
-    this.dateFormControlnOptions[dateColumn].reset()
+  clearDate() {
+    this.dateFormControlnOptions[this.BOOKING_DATE].reset()
+    this.dateFormControlnOptions[this.RETURN_DATE].reset()
+    this.filteredValues.bookingDate = '';
+    this.filteredValues.returnDate = '';
     this.getAllDevicesWithPagination();
   }
 
@@ -301,16 +297,12 @@ export class OwningPageComponent {
     Object.entries(this.filteredValues).forEach(([key]: any) => {
       this.filteredValues[key] = "";
     });
-    this.getAllDevicesWithPagination();
+    this.clearDate()
   }
 
   updateReturnOwnedDevice(row: any) {
-    console.log(row);
-    console.log(this.userId);
     this.deviceService.updateReturnOwnedDevice(row.Id, this.userId).subscribe((data: any) => {
-      console.log(data.oldKeepers);
       this.notification("UPDATED SUCCESSFULLY", 'Close', "success-snackbar")
-
       this.getAllDevicesWithPagination();
     })
   }
@@ -420,5 +412,4 @@ export class OwningPageComponent {
       }
     }
   }
-
 }
