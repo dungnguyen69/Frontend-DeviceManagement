@@ -162,6 +162,9 @@ export class RequestPageComponent implements OnInit {
       case this.TRANSFERRED:
         this.updateRequestStatus(requestId, requestStatus, "Confirmed transfer successfully");
         break;
+      case this.EXTENDING:
+        this.updateRequestStatus(requestId, requestStatus, "Confirmed transfer successfully");
+        break;
     }
   }
 
@@ -177,13 +180,11 @@ export class RequestPageComponent implements OnInit {
   }
 
   handleApproveDisabled(data: any) {
-    return this.isUserApprover(data) ?
-      "icon-action-approve" : "icon-action-disabled";
+    return "icon-action-approve"
   }
 
   handleCancelDisabled(data: any) {
-    return this.isUserApprover(data) || this.isUserRequester(data) ?
-      "icon-action-cancel" : "icon-action-cancel-disabled";
+    return "icon-action-cancel";
   }
 
   handleTransferDisabled(data: any) {
@@ -203,6 +204,14 @@ export class RequestPageComponent implements OnInit {
 
   isUserNextKeeper(data: any) {
     return this.username === data.next_keeper && data.request_status === "APPROVED"
+  }
+
+  isUserApproverForExtension(data: any) {
+    return this.username === data.accepter && data.request_status === "EXTENDING"
+  }
+
+  isUserNextKeeperForExtension(data: any) {
+    return this.username === data.next_keeper && data.request_status === "EXTENDING"
   }
 
   sortData(sort: Sort) {

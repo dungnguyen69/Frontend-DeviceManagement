@@ -45,7 +45,8 @@
                     <span>Detail</span>
                 </th>
                 <td mat-cell *matCellDef="let row;let i=index">
-                    <mat-icon class="detail-icon" clicK (click)="openDialogUpdate(row.device_id,i+1)">pageview</mat-icon>
+                    <mat-icon class="detail-icon" clicK
+                        (click)="openDialogUpdate(row.device_id,i+1)">pageview</mat-icon>
                 </td>
             </ng-container>
             <ng-container matColumnDef="Detail">
@@ -273,7 +274,8 @@
                         <mat-date-range-input [rangePicker]="rangePicker">
                             <input matStartDate placeholder="Booking date"
                                 [formControl]="dateFormControlnOptions[BOOKING_DATE]">
-                            <input matEndDate placeholder="Return date" [formControl]="dateFormControlnOptions[RETURN_DATE]">
+                            <input matEndDate placeholder="Return date"
+                                [formControl]="dateFormControlnOptions[RETURN_DATE]">
                         </mat-date-range-input>
                         <mat-datepicker-toggle matIconSuffix [for]="rangePicker">
                         </mat-datepicker-toggle>
@@ -301,9 +303,16 @@
                             matTooltip="As the approver concurs the request">
                             <mat-icon [ngClass]="handleApproveDisabled(row)">check_circle</mat-icon>
                         </button>
-                        <button mat-icon-button *ngIf="isUserApprover(row) || isUserRequester(row)"
+
+                        <button mat-icon-button *ngIf="isUserApproverForExtension(row)"
+                            (click)="checkRequestStatus(row.Id, EXTENDING)"
+                            matTooltip="As the approver allow this extending request">
+                            <mat-icon [ngClass]="handleApproveDisabled(row)">check_circle</mat-icon>
+                        </button>
+                        
+                        <button mat-icon-button *ngIf="isUserApprover(row) || isUserRequester(row) || isUserApproverForExtension(row) || isUserNextKeeperForExtension(row)"
                             (click)="checkRequestStatus(row.Id, CANCELLED)"
-                            matTooltip="As the requester/approver cancels the request">
+                            matTooltip="As the approver cancels the request">
                             <mat-icon [ngClass]="handleCancelDisabled(row)">cancel</mat-icon>
                         </button>
 
@@ -312,6 +321,8 @@
                             matTooltip="As the next keeper asserts the device transferred">
                             <mat-icon [ngClass]="handleTransferDisabled(row)">mobile_friendly</mat-icon>
                         </button>
+
+                        
                     </div>
                 </td>
             </ng-container>

@@ -16,6 +16,7 @@ import { AddDeviceComponent } from '../add-device/add-device.component';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import * as saveAs from 'file-saver';
 import { ImportDeviceComponent } from '../import-device/import-device.component';
+import { RequestService } from 'src/app/services/request.service';
 @Component({
   selector: 'app-keeping-page',
   templateUrl: './keeping-page.component.html',
@@ -52,9 +53,9 @@ export class KeepingPageComponent {
   readonly columnsIndex = constants;
   readonly pageSizeOptions: number[] = [10, 20, 50, 100];
   readonly columns: string[] = ['Number', 'Detail', 'SerialNumber', 'DeviceName', 'Status', 'ItemType', 'PlatformName', 'PlatformVersion',
-    'RamSize', 'DisplaySize', 'StorageSize', 'InventoryNumber', 'Project', 'Origin', 'Owner', 'Keeper', 'Comments', "KeeperNumber", "Date", 'Action'];
+    'RamSize', 'DisplaySize', 'StorageSize', 'InventoryNumber', 'Project', 'Origin', 'Owner', 'Keeper', 'Comments', "KeeperNumber", "Date", "MaxExtending", 'Action'];
   readonly columnFilters: string[] = ['NumberFilter', 'Update', 'SerialNumberFilter', 'DeviceNameFilter', 'StatusFilter', 'ItemTypeFilter', 'PlatformNameFilter', 'PlatformVersionFilter',
-    'RamSizeFilter', 'DisplaySizeFilter', 'StorageSizeFilter', 'InventoryNumberFilter', 'ProjectFilter', 'OriginFilter', 'OwnerFilter', 'KeeperFilter', 'CommentsFilter', "KeeperNumberFilter", "DateFilter", 'select'];
+    'RamSizeFilter', 'DisplaySizeFilter', 'StorageSizeFilter', 'InventoryNumberFilter', 'ProjectFilter', 'OriginFilter', 'OwnerFilter', 'KeeperFilter', 'CommentsFilter', "KeeperNumberFilter", "DateFilter", 'maxExtending', 'select'];
 
   /* Store filter options in an array*/
   readonly dropdownOptions: { [key: string]: any } = {
@@ -100,7 +101,8 @@ export class KeepingPageComponent {
   constructor(private dialog: MatDialog,
     private deviceService: DeviceService,
     private _snackBar: MatSnackBar,
-    private tokenStorageService: TokenStorageService) { }
+    private tokenStorageService: TokenStorageService,
+    private requestService: RequestService) { }
 
   ngOnInit() {
     this.checkLogin();
@@ -258,7 +260,49 @@ export class KeepingPageComponent {
     this.clearDate();
   }
 
-  updateReturnKeepingDevice(row: any) {
+  openConfirmationForUpdateReturnKeepingDevice(row: any) {
+    this.dialog.open(ConfirmationDialogComponent, {
+      data: {
+        message: "Do you really want to confirm ?",
+      }
+    })
+      .afterClosed().subscribe(
+        {
+          next: (result) => {
+            if (result?.event == "accept") {
+              this.updateReturnKeepingDevice(row);
+            }
+          }
+        }
+      );
+  }
+
+  extendDuration(date: any, device: any) {
+    this.dialog.open(ConfirmationDialogComponent, {
+      data: {
+        message: "Do you really want to extend ?",
+      }
+    })
+      .afterClosed().subscribe(
+        {
+          next: (result) => {
+            if (result?.event == "accept") {
+              this.requestService.extendDurationForReturnDate(device.Id, device.Keeper, date.value).subscribe({
+                next: (data) => {
+                  this.notification(data.message, 'Close', "success-snackbar")
+                  this.getAllDevicesWithPagination();
+                },
+                error: (error) => {
+                  this.notification(error.message, 'Close', "error-snackbar")
+                }
+              })
+            }
+          }
+        }
+      );
+  }
+
+  private updateReturnKeepingDevice(row: any) {
     this.deviceService.updateReturnKeepingdDevice(row.Id, this.userId, row.KeeperNo).subscribe({
       next: () => {
         this.notification("UPDATED SUCCESSFULLY", 'Close', "success-snackbar")
@@ -288,6 +332,8 @@ export class KeepingPageComponent {
       .getAllKeepingDevicesWithPagination(this.userId, this.pageSize!, this.pageIndex + 1, this.sortBy, this.sortDir, this.filteredValues)
       .subscribe((data: any) => {
         this.dataSource.data = data['devicesList'];
+        console.log(this.dataSource.data);
+
         this.dropdownOptions.status = data['statusList'];
         this.dropdownOptions.itemType = data['itemTypeList'];
         this.dropdownOptions.project = data['projectList'];

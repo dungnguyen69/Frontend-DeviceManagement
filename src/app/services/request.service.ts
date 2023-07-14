@@ -42,4 +42,9 @@ export class RequestService {
   updateRequestStatus(input: any): Observable<any> {
     return this.http.post(this.baseUrl + 'api/requests/status-update', input);
   }
+
+  extendDurationForReturnDate(deviceId: number, nextKeeper: string, returnDate: any): Observable<any> {
+    let inputs = { deviceId: deviceId, nextKeeper: nextKeeper, returnDate: returnDate }
+    return this.http.post(this.baseUrl + `api/requests/keepers/extend-duration`, inputs);
+  }
 }
