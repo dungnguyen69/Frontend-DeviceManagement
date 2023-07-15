@@ -24,7 +24,25 @@ label {
     }
 }
 
+@media (min-width: 990px) {
+    div.list-orders {
+        text-align: center;
+    }
+}
+
 ::ng-deep .mat-form-field-appearance-outline.mat-form-field-disabled,
 ::ng-deep .mat-form-field-outline {
     opacity: 0;
+}
+
+.orders {
+    transition: transform .2s;
+    color: black;
+    cursor: pointer;
+
+}
+
+.orders:hover {
+    color: aquamarine;
+    transform: scale(1.5);
 }

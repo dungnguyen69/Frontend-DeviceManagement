@@ -1,11 +1,12 @@
 import { Component, OnInit, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { lastValueFrom } from 'rxjs';
 import { DeviceService } from 'src/app/services/device.service';
 import { UserService } from 'src/app/services/user.service';
 import { ADD_DEVICE } from 'src/app/utils/constant';
+import { KeeperOrderListComponent } from '../keeper-order-list/keeper-order-list.component';
 
 @Component({
   selector: 'app-update-device',
@@ -24,7 +25,7 @@ export class UpdateDeviceComponent implements OnInit {
   deviceIndex: number
   columnIndex = ADD_DEVICE;
   unfilteredPlatformVersionSuggestions: any = [];
-
+  keeperOrderList = [];
   readonly suggestionOptions: { [key: string]: any } = {
     0: [],
     1: [],
@@ -50,11 +51,12 @@ export class UpdateDeviceComponent implements OnInit {
     keeper: '', inventoryNumber: '', serialNumber: '', origin: '', project: '', bookingDate: '', returnDate: '', comments: ''
   };
 
-  constructor(private fb: FormBuilder, private dialogRef: MatDialogRef<UpdateDeviceComponent>,
+  constructor(private dialogRef: MatDialogRef<UpdateDeviceComponent>,
     private deviceService: DeviceService,
     private userService: UserService,
     private _snackBar: MatSnackBar,
-    @Inject(MAT_DIALOG_DATA) public data: any) {
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private dialog: MatDialog) {
     this.rowId = data.dataKey;
     this.deviceIndex = data.index;
     this.readOnly = data.readOnly;
@@ -111,20 +113,7 @@ export class UpdateDeviceComponent implements OnInit {
       bookingDate: new FormControl(''),
       returnDate: new FormControl('')
     }, { updateOn: 'change' });
-
-    this.addDeviceForm.controls["owner"].valueChanges
-      .subscribe((value: string) => {
-        if (value.trim().length != 0) {
-          this.usersSuggestion(this.USERNAME, value, true)
-
-        }
-        // else {
-        //   this.ownerSuggestions = [];
-        // }
-      })
-
     this.getDetailDevice(this.rowId);
-
   }
 
   getPlatformVersion(event: any): void {
@@ -135,6 +124,8 @@ export class UpdateDeviceComponent implements OnInit {
     this.fetchDropdownValuesIntoSuggestions();
     this.deviceService.getDetailDevice(rowId)
       .subscribe((data: any) => {
+        console.log(data);
+
         this.addDeviceForm.setValue({
           id: data['detailDevice'].id,
           name: data['detailDevice'].name,
@@ -155,6 +146,8 @@ export class UpdateDeviceComponent implements OnInit {
           bookingDate: data['detailDevice'].bookingDate,
           returnDate: data['detailDevice'].returnDate
         })
+
+        this.keeperOrderList = data['detailDevice'].keeperOrder;
         if (data['detailDevice'].statusId == "2" || this.readOnly) {
           this.isStatusOccupied = true;
           this.getOccupiedDevice();
@@ -164,7 +157,6 @@ export class UpdateDeviceComponent implements OnInit {
         this.getPlatformVersion(getPlatform.name);
       });
   }
-
 
   onNoClick(): void {
     this.dialogRef.close({ event: "Cancel" });
@@ -190,6 +182,14 @@ export class UpdateDeviceComponent implements OnInit {
     }
   }
 
+  showKeeperOrder() {
+    this.dialog.open(KeeperOrderListComponent, {
+      data: {
+        list: this.keeperOrderList
+      }
+    })
+  }
+
   //Check whether inputs whose tables are in the database match the database. 
   private areSuggestionValuesValid(errors: any): void {
     let arr: string[] = [];
@@ -210,14 +210,6 @@ export class UpdateDeviceComponent implements OnInit {
       duration: 6000,
       panelClass: [className]
     });
-  }
-
-  private usersSuggestion(column: number, keyword: string, isOwner: boolean): void {
-    this.userService.suggest(column, keyword)
-      .subscribe((data: any) => {
-        if (isOwner)
-          this.suggestionOptions[this.columnIndex.OWNER] = data['keywordList'];
-      });
   }
 
   private noWhitespaceValidator(control: FormControl) {
@@ -247,7 +239,7 @@ export class UpdateDeviceComponent implements OnInit {
     this.occupiedDevice.project = this.suggestionOptions[ADD_DEVICE.PROJECT].find((project: any) => project.id == this.addDeviceForm.value.projectId).name;
   }
 
-  fetchDropdownValuesIntoSuggestions(): void {
+  private fetchDropdownValuesIntoSuggestions(): void {
     this.deviceService.getDropDownValues().subscribe(
       {
         next: (response: any) => {

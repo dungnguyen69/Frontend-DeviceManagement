@@ -47,6 +47,7 @@ import { ResetPasswordComponent } from './components/reset-password/reset-passwo
 import { ReceiveForgotPasswordComponent } from './components/receive-forgot-password/receive-forgot-password.component';
 import { CookieService } from 'ngx-cookie-service';
 import { ErrorPageComponent } from './components/error-page/error-page.component';
+import { KeeperOrderListComponent } from './components/keeper-order-list/keeper-order-list.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -68,7 +69,8 @@ import { ErrorPageComponent } from './components/error-page/error-page.component
     KeepingPageComponent,
     ResetPasswordComponent,
     ReceiveForgotPasswordComponent,
-    ErrorPageComponent
+    ErrorPageComponent,
+    KeeperOrderListComponent
   ],
   imports: [
     BrowserModule,

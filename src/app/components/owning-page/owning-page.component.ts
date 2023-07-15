@@ -173,7 +173,7 @@ export class OwningPageComponent {
       .afterClosed().subscribe(
         {
           next: (result) => {
-            if (result.event == "accept") {
+            if (result?.event == "accept") {
               this.deleteDevice(this.selection.selected);
               this.selection.clear();
             }

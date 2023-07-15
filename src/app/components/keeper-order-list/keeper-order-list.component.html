@@ -1,0 +1,21 @@
+<div class="container">
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Keeper Number</th>
+                <th>Keeper Name</th>
+                <th>Booking Date - Due Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let keeperOrder of keeperOrderList">
+                <td>{{keeperOrder.keeperNo}}</td>
+                <td>{{keeperOrder.keeperName}}</td>
+                <td>{{keeperOrder.bookingDate |
+                    date:'longDate'}} -
+                    {{keeperOrder.dueDate |
+                    date:'longDate'}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

@@ -222,7 +222,6 @@ export class BookingPageComponent implements OnInit {
     }
 
     openDialogUpdate(rowId: number, tableIndex: number) {
-        // let readOnly = !this.allowUpdate();
         this.dialog.open(UpdateDeviceComponent, {
             data: {
                 dataKey: rowId,
