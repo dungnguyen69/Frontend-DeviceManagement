@@ -1,0 +1,84 @@
+<div class="global-container">
+    <div class="card login-form">
+        <div class="card-body">
+            <h2 class="card-title text-center">Register</h2>
+            <form name="form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
+                <div class="form-group">
+                    <label for="userName">Username</label>
+                    <input type="text" class="form-control form-control-sm" name="userName" [(ngModel)]="form.userName"
+                        required #userName="ngModel" />
+                    <div class="alert alert-danger" role="alert" *ngIf="userName.errors && f.submitted">
+                        Username is required!
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="username">Email</label>
+                    <input type="text" class="form-control form-control-sm" name="email" [(ngModel)]="form.email"
+                        required #email="ngModel" />
+                    <div class="alert alert-danger" role="alert" *ngIf="email.errors && f.submitted">
+                        Email is required!
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control form-control-sm" name="password"
+                        [(ngModel)]="form.password" required minlength="6" #password="ngModel" />
+                    <div class="alert alert-danger" role="alert" *ngIf="password.errors && f.submitted">
+                        <div *ngIf="password.errors.required">Password is required</div>
+                        <div *ngIf="password.errors.minlength">
+                            Password must be at least 6 characters
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="matchingPassword">Confirm Password</label>
+                    <input type="password" class="form-control form-control-sm" name="matchingPassword"
+                        [(ngModel)]="form.matchingPassword" required minlength="6" #matchingPassword="ngModel" />
+                    <div class="alert alert-danger" role="alert" *ngIf="matchingPassword.errors && f.submitted">
+                        <div *ngIf="matchingPassword.errors.required">Confirm password is required</div>
+                        <div *ngIf="matchingPassword.errors.minlength">
+                            Password must be at least 6 characters
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="firstName">First Name</label>
+                    <input type="text" class="form-control form-control-sm" name="firstName"
+                        [(ngModel)]="form.firstName" required #firstName="ngModel" />
+                    <div class="alert alert-danger" role="alert" *ngIf="firstName.errors && f.submitted">
+                        First Name is required!
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Last Name</label>
+                    <input type="text" class="form-control form-control-sm" name="lastName" [(ngModel)]="form.lastName"
+                        required #lastName="ngModel" />
+                    <div class="alert alert-danger" role="alert" *ngIf="lastName.errors && f.submitted">
+                        Last Name is required!
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="phoneNumber">Phone Number</label>
+                    <input type="text" class="form-control form-control-sm" name="phoneNumber"
+                        [(ngModel)]="form.phoneNumber" required #phoneNumber="ngModel" />
+                    <div class="alert alert-danger" role="alert" *ngIf="phoneNumber.errors && f.submitted">
+                        Phone Number is required!
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary btn-block">
+                        Register
+                    </button>
+                </div>
+                <div class="form-group">
+                    <div class="alert alert-danger" role="alert" *ngIf="f.submitted && isLoginFailed">
+                        Registration failed: {{ errorMessage }}
+                    </div>
+                </div>
+            </form>
+            <div class="alert alert-success" *ngIf="isRegister">
+                Registered successfully! Please check your email.
+            </div>
+        </div>
+    </div>
+</div>

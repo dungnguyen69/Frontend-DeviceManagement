@@ -19,6 +19,22 @@ export class AuthService {
     return this.http.post(this.baseUrl + 'api/users/login', { username, password }, httpOptions);
   }
 
+  register(data: any): Observable<any> {
+    return this.http.post(this.baseUrl + 'api/users/register', data, httpOptions);
+  }
+
+  verifyToken(token: any): Observable<any> {
+    return this.http.post(this.baseUrl + 'api/users/verify', token, {
+      headers: new HttpHeaders({ 'Content-Type': 'text/plain' })
+    });
+  }
+
+  resendToken(token: any): Observable<any> {
+    return this.http.post(this.baseUrl + 'token/resend', token, {
+      headers: new HttpHeaders({ 'Content-Type': 'text/plain' })
+    });
+  }
+
   forgotPassword(email: string): Observable<any> {
     return this.http.post(this.baseUrl + `api/users/reset_password?email=${email}`, httpOptions);
   }
@@ -27,31 +43,7 @@ export class AuthService {
     return this.http.put(this.baseUrl + `api/users/save_forgot_password`, password, httpOptions);
   }
 
-
   saveResetPassword(password: any): Observable<any> {
     return this.http.put(this.baseUrl + `api/users/save_reset_password`, password, httpOptions);
   }
-  register(
-    userName: string,
-    email: string,
-    password: string,
-    matchingPassword: string,
-    badgeId: string,
-    firstName: string,
-    lastName: string,
-    phoneNumber: string,
-    project: string): Observable<any> {
-    return this.http.post(this.baseUrl + 'api/users/register', {
-      userName,
-      email,
-      password,
-      matchingPassword,
-      badgeId,
-      firstName,
-      lastName,
-      phoneNumber,
-      project
-    }, httpOptions);
-  }
-
 }

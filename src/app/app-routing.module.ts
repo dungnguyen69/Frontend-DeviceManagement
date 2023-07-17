@@ -11,6 +11,8 @@ import { KeepingPageComponent } from './components/keeping-page/keeping-page.com
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import { ReceiveForgotPasswordComponent } from './components/receive-forgot-password/receive-forgot-password.component';
 import { ErrorPageComponent } from './components/error-page/error-page.component';
+import { RegisterPageComponent } from './components/register-page/register-page.component';
+import { ReceiveEmailVerificationComponent } from './components/receive-email-verification/receive-email-verification.component';
 
 const routes: Routes = [
   { path: 'home', component: HomePageComponent },
@@ -22,8 +24,10 @@ const routes: Routes = [
   { path: 'keeping', component: KeepingPageComponent },
   { path: 'send-forgot-password', component: SendForgotPasswordComponent },
   { path: 'receive-forgot-password', component: ReceiveForgotPasswordComponent },
+  { path: 'email-verification', component: ReceiveEmailVerificationComponent },
   { path: 'reset-password', component: ResetPasswordComponent },
   { path: 'error-page', component: ErrorPageComponent },
+  { path: 'register', component: RegisterPageComponent },
   { path: '', redirectTo: 'home', pathMatch: 'full' }
 ];
 @NgModule({
