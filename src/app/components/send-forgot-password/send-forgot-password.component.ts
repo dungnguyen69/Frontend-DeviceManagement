@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
 
@@ -8,10 +9,11 @@ import { TokenStorageService } from 'src/app/services/token-storage.service';
   templateUrl: './send-forgot-password.component.html',
   styleUrls: ['./send-forgot-password.component.scss']
 })
-export class SendForgotPasswordComponent implements OnInit {
+export class SendForgotPasswordComponent implements OnInit, OnDestroy {
   form: any = {
     email: null,
   };
+  onDestroy$: Subject<boolean> = new Subject();
   isLoggedIn = false;
   isLoginFailed = false;
   errorMessage = '';
@@ -31,31 +33,30 @@ export class SendForgotPasswordComponent implements OnInit {
     }
   }
 
+  ngOnDestroy() {
+    this.onDestroy$.next(true);
+    this.onDestroy$.unsubscribe();
+  }
+
   onSubmit(): void {
     const { email } = this.form;
     this.sentSuccesfull = false;
     this.isSubmitted = true;
-    this.authService.forgotPassword(email).subscribe(
-      {
-        next: () => {
-          this.sentSuccesfull = true;
-          this.isConfirmationFailed = false;
-        },
-        error: (error) => {
-          this.isSubmitted = false;
-          this.errorMessage = error.error.message;
-          this.isConfirmationFailed = true;
-        },
-      });
+    this.authService
+      .forgotPassword(email)
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe(
+        {
+          next: () => {
+            this.sentSuccesfull = true;
+            this.isConfirmationFailed = false;
+          },
+          error: (error) => {
+            this.isSubmitted = false;
+            this.errorMessage = error.error.message;
+            this.isConfirmationFailed = true;
+          },
+        });
 
-    }
-
-  private notification(message: string, action: string, className: string) {
-    this._snackBar.open(message, action, {
-      horizontalPosition: "right",
-      verticalPosition: "top",
-      duration: 4000,
-      panelClass: [className]
-    });
   }
 }

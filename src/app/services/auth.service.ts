@@ -29,8 +29,12 @@ export class AuthService {
     });
   }
 
+  verifyPasswordToken(token: any): Observable<any> {
+    return this.http.post(this.baseUrl + 'api/users/verify_reset_password_token', token);
+  }
+
   resendToken(token: any): Observable<any> {
-    return this.http.post(this.baseUrl + 'token/resend', token, {
+    return this.http.post(this.baseUrl + 'api/users/resendRegistrationToken', token, {
       headers: new HttpHeaders({ 'Content-Type': 'text/plain' })
     });
   }
