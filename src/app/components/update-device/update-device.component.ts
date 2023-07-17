@@ -1,11 +1,11 @@
-import { Component, OnInit, Inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { lastValueFrom } from 'rxjs';
+import { Subject, lastValueFrom, takeUntil } from 'rxjs';
 import { DeviceService } from 'src/app/services/device.service';
 import { UserService } from 'src/app/services/user.service';
-import { ADD_DEVICE } from 'src/app/utils/constant';
+import { ADD_DEVICE } from 'src/assets/constant';
 import { KeeperOrderListComponent } from '../keeper-order-list/keeper-order-list.component';
 
 @Component({
@@ -14,7 +14,7 @@ import { KeeperOrderListComponent } from '../keeper-order-list/keeper-order-list
   styleUrls: ['./update-device.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class UpdateDeviceComponent implements OnInit {
+export class UpdateDeviceComponent implements OnInit, OnDestroy {
   addDeviceForm: FormGroup;
   submitted = false;
   readOnly: boolean;
@@ -26,6 +26,8 @@ export class UpdateDeviceComponent implements OnInit {
   columnIndex = ADD_DEVICE;
   unfilteredPlatformVersionSuggestions: any = [];
   keeperOrderList = [];
+  onDestroy$: Subject<boolean> = new Subject();
+
   readonly suggestionOptions: { [key: string]: any } = {
     0: [],
     1: [],
@@ -116,16 +118,21 @@ export class UpdateDeviceComponent implements OnInit {
     this.getDetailDevice(this.rowId);
   }
 
+  ngOnDestroy() {
+    this.onDestroy$.next(true);
+    this.onDestroy$.unsubscribe();
+  }
+
   getPlatformVersion(event: any): void {
     this.suggestionOptions[ADD_DEVICE.PLATFORM_VERSION] = this.unfilteredPlatformVersionSuggestions.filter((x: any) => x.name == event);
   }
 
   getDetailDevice(rowId: number) {
     this.fetchDropdownValuesIntoSuggestions();
-    this.deviceService.getDetailDevice(rowId)
+    this.deviceService
+      .getDetailDevice(rowId)
+      .pipe(takeUntil(this.onDestroy$))
       .subscribe((data: any) => {
-        console.log(data);
-
         this.addDeviceForm.setValue({
           id: data['detailDevice'].id,
           name: data['detailDevice'].name,
@@ -166,7 +173,9 @@ export class UpdateDeviceComponent implements OnInit {
     this.submitted = true;
     if (this.addDeviceForm.valid) {
       delete this.addDeviceForm.value.platformNameId;
-      this.deviceService.updateDevice(this.rowId, this.addDeviceForm.value)
+      this.deviceService
+        .updateDevice(this.rowId, this.addDeviceForm.value)
+        .pipe(takeUntil(this.onDestroy$))
         .subscribe
         (
           {
@@ -240,23 +249,26 @@ export class UpdateDeviceComponent implements OnInit {
   }
 
   private fetchDropdownValuesIntoSuggestions(): void {
-    this.deviceService.getDropDownValues().subscribe(
-      {
-        next: (response: any) => {
-          this.suggestionOptions[ADD_DEVICE.PLATFORM_NAME] = [...new Set(response['platformList'].map((a: any) => a.name))];
-          this.unfilteredPlatformVersionSuggestions = response['platformList'];
-          this.suggestionOptions[ADD_DEVICE.RAM] = response['ramList'];
-          this.suggestionOptions[ADD_DEVICE.SCREEN] = response['screenList'];
-          this.suggestionOptions[ADD_DEVICE.STORAGE] = response['storageList'];
-          this.suggestionOptions[ADD_DEVICE.STATUS] = response['statusList'];
-          this.suggestionOptions[ADD_DEVICE.PROJECT] = response['projectList'];
-          this.suggestionOptions[ADD_DEVICE.ORIGIN] = response['originList'];
-          this.suggestionOptions[ADD_DEVICE.ITEM_TYPE] = response['itemTypeList'];
+    this.deviceService
+      .getDropDownValues()
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe(
+        {
+          next: (response: any) => {
+            this.suggestionOptions[ADD_DEVICE.PLATFORM_NAME] = [...new Set(response['platformList'].map((a: any) => a.name))];
+            this.unfilteredPlatformVersionSuggestions = response['platformList'];
+            this.suggestionOptions[ADD_DEVICE.RAM] = response['ramList'];
+            this.suggestionOptions[ADD_DEVICE.SCREEN] = response['screenList'];
+            this.suggestionOptions[ADD_DEVICE.STORAGE] = response['storageList'];
+            this.suggestionOptions[ADD_DEVICE.STATUS] = response['statusList'];
+            this.suggestionOptions[ADD_DEVICE.PROJECT] = response['projectList'];
+            this.suggestionOptions[ADD_DEVICE.ORIGIN] = response['originList'];
+            this.suggestionOptions[ADD_DEVICE.ITEM_TYPE] = response['itemTypeList'];
 
-        },
-        error: (error) => {
-          console.error(error);
-        },
-      });
+          },
+          error: (error) => {
+            console.error(error);
+          },
+        });
   }
 }

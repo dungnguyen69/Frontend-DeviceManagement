@@ -12,7 +12,7 @@ import { AuthService } from 'src/app/services/auth.service';
 import { LocalService } from 'src/app/services/local.service';
 import { RequestService } from 'src/app/services/request.service';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
-import { REQUEST } from 'src/app/utils/constant';
+import { REQUEST } from 'src/assets/constant';
 import { UpdateDeviceComponent } from '../update-device/update-device.component';
 import { Sort } from '@angular/material/sort';
 export const DD_MM_YYYY_Format = {

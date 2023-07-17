@@ -1,13 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { AddDeviceComponent } from '../add-device/add-device.component';
 import { BookingPageComponent } from '../booking-page/booking-page.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DeviceService } from 'src/app/services/device.service';
-import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import { SelectionModel } from '@angular/cdk/collections';
 import { saveAs } from 'file-saver';
-import { ImportDeviceComponent } from '../import-device/import-device.component';
 import { LocalService } from 'src/app/services/local.service';
 import { SubmittingPageComponent } from '../submitting-page/submitting-page.component';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
@@ -52,62 +49,6 @@ export class HomePageComponent implements OnInit {
       this.username = user.username;
     }
   }
-  openDialogAddDevice() {
-    const dialogRef = this.dialog.open(AddDeviceComponent, {
-      autoFocus: false
-    })
-      .afterClosed().subscribe(
-        {
-          next: (data: any) => {
-            if (data?.event == "Submit") {
-              this.bookingPage.getAllDevicesWithPagination();
-              this.addSuccessful = "ADDED SUCCESSFULLY";
-              this.notification(this.addSuccessful, 'Close', "success-snackbar");
-            }
-          },
-          error: () => {
-            this.addUnsuccessful = "[ERROR] ADDED UNSUCCESSFULLY";
-            this.notification(this.addUnsuccessful, 'Close', "error-snackbar");
-          }
-        }
-      );
-    return dialogRef;
-  }
-
-  openConfirmationForDeletion() {
-    this.dialog.open(ConfirmationDialogComponent, {
-      data: {
-        message: "Do you really want to delete ?",
-      }
-    })
-      .afterClosed().subscribe(
-        {
-          next: (result) => {
-            if (result.event == "accept") {
-              this.deleteDevice(this.bookingPage.selection.selected);
-              this.bookingPage.selection.clear();
-            }
-          }
-        }
-      );
-  }
-
-  deleteDevice(selectList: any) {
-    if (selectList.length != 0) {
-      for (var device of selectList) {
-        this.deviceService.deleteDevice(device.Id!).subscribe({
-          next: () => {
-            this.bookingPage.getAllDevicesWithPagination();
-            this.notification("DELETED SUCCESSFULLY", 'Close', "success-snackbar");
-          },
-          error: (error) => {
-            let errorMessage = error.error.errorMessage;
-            this.notification(errorMessage, 'Close', "error-snackbar");
-          }
-        });
-      }
-    }
-  }
 
   exportDevice() {
     this.deviceService.exportDevice().subscribe((data: any) => {
@@ -124,24 +65,6 @@ export class HomePageComponent implements OnInit {
     )
   }
 
-  importDevice() {
-    this.dialog.open(ImportDeviceComponent, {
-    })
-      .afterClosed().subscribe(
-        {
-          next: (result: any) => {
-            if (result?.event == "accept") {
-              this.bookingPage.getAllDevicesWithPagination();
-            }
-          },
-          error: () => {
-            this.errorMessage = "[ERROR] Import error please try again";
-            this.notification(this.errorMessage, 'Close', "error-snackbar")
-          }
-        }
-      );
-  }
-
   submitting() {
     const dialogRef = this.dialog.open(SubmittingPageComponent, {});
     dialogRef.componentInstance.recount.subscribe((data) => {
@@ -151,7 +74,6 @@ export class HomePageComponent implements OnInit {
       {
         next: (result: any) => {
           if (result?.event == "accept") {
-            this.bookingPage.getAllDevicesWithPagination();
           }
         },
         error: () => {

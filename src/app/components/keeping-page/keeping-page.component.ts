@@ -1,5 +1,5 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -8,7 +8,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { IDevice } from 'src/app/models/IDevice';
 import { DeviceService } from 'src/app/services/device.service';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
-import { constants } from 'src/app/utils/constant';
+import { constants } from 'src/assets/constant';
 import { UpdateDeviceComponent } from '../update-device/update-device.component';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { PageEvent } from '@angular/material/paginator';
@@ -17,14 +17,35 @@ import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation
 import * as saveAs from 'file-saver';
 import { ImportDeviceComponent } from '../import-device/import-device.component';
 import { RequestService } from 'src/app/services/request.service';
+import { MomentDateAdapter } from '@angular/material-moment-adapter';
+import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
+import { Subject, takeUntil } from 'rxjs';
+
+const DD_MM_YYYY_Format = {
+  parse: {
+    dateInput: 'DD/MM/YYYY',
+  },
+  display: {
+    dateInput: 'DD/MM/YYYY',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
+
 @Component({
   selector: 'app-keeping-page',
   templateUrl: './keeping-page.component.html',
-  styleUrls: ['./keeping-page.component.scss']
+  styleUrls: ['./keeping-page.component.scss'],
+  providers: [
+    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
+    { provide: MAT_DATE_FORMATS, useValue: DD_MM_YYYY_Format },
+  ],
 })
-export class KeepingPageComponent {
+export class KeepingPageComponent implements OnInit, OnDestroy {
   @Output() isUpdatedSuccessful = new EventEmitter<any>();
   @Output() countNumberOfBookingDevices = new EventEmitter<any>();
+  onDestroy$: Subject<boolean> = new Subject();
   selection = new SelectionModel<IDevice>(true, []);
   pageIndex: number = 0;
   pageSize: number = 10;
@@ -110,59 +131,9 @@ export class KeepingPageComponent {
     this.checkDateInput();
   }
 
-  openDialogAddDevice() {
-    const dialogRef = this.dialog.open(AddDeviceComponent, {
-      autoFocus: false
-    })
-      .afterClosed().subscribe(
-        {
-          next: (data: any) => {
-            if (data?.event == "Submit") {
-              this.getAllDevicesWithPagination();
-              this.addSuccessful = "ADDED SUCCESSFULLY";
-              this.notification(this.addSuccessful, 'Close', "success-snackbar");
-            }
-          },
-          error: () => {
-            this.addUnsuccessful = "[ERROR] ADDED UNSUCCESSFULLY";
-            this.notification(this.addUnsuccessful, 'Close', "error-snackbar");
-          }
-        }
-      );
-    return dialogRef;
-  }
-
-  exportDevice() {
-    this.deviceService.exportDeviceForOwner(this.userId).subscribe((data: any) => {
-      let datetime = new Date()
-      let currentTime = (datetime.getFullYear() + '-' +
-        this.formatNumber(datetime.getMonth() + 1) + '-' +
-        this.formatNumber(datetime.getDate()) + ' ' +
-        this.formatNumber(datetime.getHours()) + '-' +
-        this.formatNumber(datetime.getMinutes()) + '-' +
-        this.formatNumber(datetime.getSeconds())).toString();
-      let exportDate = "Export_File_" + currentTime + ".xlsx";
-      this.downLoadFile(exportDate, data, "application/ms-excel");
-    }
-    )
-  }
-
-  importDevice() {
-    this.dialog.open(ImportDeviceComponent, {
-    })
-      .afterClosed().subscribe(
-        {
-          next: (result: any) => {
-            if (result?.event == "accept") {
-              this.getAllDevicesWithPagination();
-            }
-          },
-          error: () => {
-            let errorMessage = "[ERROR] Import error please try again";
-            this.notification(errorMessage, 'Close', "error-snackbar")
-          }
-        }
-      );
+  ngOnDestroy() {
+    this.onDestroy$.next(true);
+    this.onDestroy$.unsubscribe();
   }
 
   applyFilterForDropdowns(date?: string) {
@@ -209,7 +180,7 @@ export class KeepingPageComponent {
     this.getAllDevicesWithPagination();
   }
 
-  openDialogUpdate(rowId: number, tableIndex: number) {
+  openDialogDetail(rowId: number, tableIndex: number) {
     this.dialog.open(UpdateDeviceComponent, {
       data: {
         dataKey: rowId,
@@ -229,6 +200,7 @@ export class KeepingPageComponent {
     if (filterValue.trim().length !== 0)
       this.deviceService
         .suggestKeywordForKeeperPage(this.userId, column, filterValue, this.filteredValues)
+        .pipe(takeUntil(this.onDestroy$))
         .subscribe((data: any) => {
           this.keywordSuggestionOptions[column] = data['keywordList'];
         });
@@ -287,15 +259,18 @@ export class KeepingPageComponent {
         {
           next: (result) => {
             if (result?.event == "accept") {
-              this.requestService.extendDurationForReturnDate(device.Id, device.Keeper, date.value).subscribe({
-                next: (data) => {
-                  this.notification(data.message, 'Close', "success-snackbar")
-                  this.getAllDevicesWithPagination();
-                },
-                error: (error) => {
-                  this.notification(error.message, 'Close', "error-snackbar")
-                }
-              })
+              this.requestService
+                .extendDurationForReturnDate(device.Id, device.Keeper, date.value)
+                .pipe(takeUntil(this.onDestroy$))
+                .subscribe({
+                  next: (data) => {
+                    this.notification(data.message, 'Close', "success-snackbar")
+                    this.getAllDevicesWithPagination();
+                  },
+                  error: (error) => {
+                    this.notification(error.message, 'Close', "error-snackbar")
+                  }
+                })
             }
           }
         }
@@ -303,37 +278,26 @@ export class KeepingPageComponent {
   }
 
   private updateReturnKeepingDevice(row: any) {
-    this.deviceService.updateReturnKeepingdDevice(row.Id, this.userId, row.KeeperNo).subscribe({
-      next: () => {
-        this.notification("UPDATED SUCCESSFULLY", 'Close', "success-snackbar")
-        this.getAllDevicesWithPagination();
-      },
-      error: () => {
-        this.notification("CANNOT RETURN BECAUSE YOUR ORDER IS THE LASTEST ORDER", 'Close', "error-snackbar")
-      }
-    });
-  }
-  private downLoadFile(fileName: string, data: any, type: string) {
-    let blob = new Blob([data], { type: type });
-    let url = window.URL.createObjectURL(blob);
-    saveAs(url, fileName)
-  }
-
-  private formatNumber(number: any) {
-    if (number < 10) {
-      return '0' + number;
-    }
-    else
-      return number;
+    this.deviceService
+      .updateReturnKeepingdDevice(row.Id, this.userId, row.KeeperNo)
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe({
+        next: () => {
+          this.notification("UPDATED SUCCESSFULLY", 'Close', "success-snackbar")
+          this.getAllDevicesWithPagination();
+        },
+        error: () => {
+          this.notification("CANNOT RETURN BECAUSE YOUR ORDER IS THE LASTEST ORDER", 'Close', "error-snackbar")
+        }
+      });
   }
 
   private getAllDevicesWithPagination() {
     this.deviceService
       .getAllKeepingDevicesWithPagination(this.userId, this.pageSize!, this.pageIndex + 1, this.sortBy, this.sortDir, this.filteredValues)
+      .pipe(takeUntil(this.onDestroy$))
       .subscribe((data: any) => {
         this.dataSource.data = data['devicesList'];
-        console.log(this.dataSource.data);
-
         this.dropdownOptions.status = data['statusList'];
         this.dropdownOptions.itemType = data['itemTypeList'];
         this.dropdownOptions.project = data['projectList'];
@@ -365,15 +329,19 @@ export class KeepingPageComponent {
   }
 
   private checkDateInput() {
-    this.dateFormControlnOptions[this.BOOKING_DATE].valueChanges.subscribe((value: string) => {
-      if (value != "" && value != null)
-        this.applyFilterForDatePicker("bookingDate", value);
-    })
+    this.dateFormControlnOptions[this.BOOKING_DATE].valueChanges
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe((value: string) => {
+        if (value != "" && value != null)
+          this.applyFilterForDatePicker("bookingDate", value);
+      })
 
-    this.dateFormControlnOptions[this.RETURN_DATE].valueChanges.subscribe((value: string) => {
-      if (value != "" && value != null)
-        this.applyFilterForDatePicker("returnDate", value);
-    })
+    this.dateFormControlnOptions[this.RETURN_DATE].valueChanges
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe((value: string) => {
+        if (value != "" && value != null)
+          this.applyFilterForDatePicker("returnDate", value);
+      })
   }
 
   private checkLogin() {
@@ -388,14 +356,6 @@ export class KeepingPageComponent {
     }
   }
 
-  private allowUpdate() {
-    if (this.isAdmin)
-      return true;
-    else if (this.isMod)
-      return true;
-    return false;
-  }
-
   private notification(message: string, action: string, className: string) {
     this._snackBar.open(message, action, {
       horizontalPosition: "right",
@@ -403,22 +363,5 @@ export class KeepingPageComponent {
       duration: 4000,
       panelClass: [className]
     });
-  }
-
-  private deleteDevice(selectList: any) {
-    if (selectList.length != 0) {
-      for (var device of selectList) {
-        this.deviceService.deleteDevice(device.Id!).subscribe({
-          next: () => {
-            this.getAllDevicesWithPagination();
-            this.notification("DELETED SUCCESSFULLY", 'Close', "success-snackbar");
-          },
-          error: (error) => {
-            let errorMessage = error.error.errorMessage;
-            this.notification(errorMessage, 'Close', "error-snackbar");
-          }
-        });
-      }
-    }
   }
 }

@@ -1,21 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
 import { UserService } from 'src/app/services/user.service';
-import { USER } from 'src/app/utils/constant';
+import { USER } from 'src/assets/constant';
 import { ProvidePermissionComponent } from '../provide-permission/provide-permission.component';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-user-page',
   templateUrl: './user-page.component.html',
   styleUrls: ['./user-page.component.scss']
 })
-export class UserPageComponent implements OnInit {
+export class UserPageComponent implements OnInit, OnDestroy {
   dataSource = new MatTableDataSource<any>();
+  onDestroy$: Subject<boolean> = new Subject();
   user: any;
   username: any;
   isLoggedIn: boolean;
@@ -46,11 +47,18 @@ export class UserPageComponent implements OnInit {
   }
   readonly columns: string[] = ['Number', 'BadgeID', 'User Name', 'First Name', 'Last Name', 'Email', 'Phone Number', 'Project', 'isEnable', 'Action'];
   readonly columnFilters: string[] = ['NumberFilter', 'BadgeIDFilter', 'UserNameFilter', 'FirstNameFilter', 'LastNameFilter', 'EmailFilter', 'PhoneNumberFilter', 'ProjectFilter', 'Enable', 'action'];
-  constructor(private _snackBar: MatSnackBar, private userService: UserService,
-    private tokenStorageService: TokenStorageService, private dialog: MatDialog) { }
+  constructor(
+    private userService: UserService,
+    private tokenStorageService: TokenStorageService,
+    private dialog: MatDialog) { }
   ngOnInit(): void {
     this.checkLogin();
     this.getUsersWithPaging();
+  }
+
+  ngOnDestroy() {
+    this.onDestroy$.next(true);
+    this.onDestroy$.unsubscribe();
   }
 
   applyFilterForDropdowns(date?: string) {
@@ -96,16 +104,6 @@ export class UserPageComponent implements OnInit {
     this.getUsersWithPaging();
   }
 
-  private getUsersWithPaging() {
-    this.userService.getUsersWithPaging(this.pageSize!, this.pageIndex + 1, this.sortBy, this.sortDir, this.filteredValues)
-      .subscribe((data: any) => {
-        this.dataSource.data = data['usersList'];
-        this.dropdownOptions.requestStatusList = data['projectList'];
-        this.totalPages = data['totalPages'];
-        this.size = data['totalElements'];
-      });
-  }
-
   openProvidePermissionDialog(row: any, tableIndex: number) {
     const dialogRef = this.dialog.open(ProvidePermissionComponent, {
       data: {
@@ -125,6 +123,18 @@ export class UserPageComponent implements OnInit {
     return dialogRef;
   }
 
+  private getUsersWithPaging() {
+    this.userService
+      .getUsersWithPaging(this.pageSize!, this.pageIndex + 1, this.sortBy, this.sortDir, this.filteredValues)
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe((data: any) => {
+        this.dataSource.data = data['usersList'];
+        this.dropdownOptions.requestStatusList = data['projectList'];
+        this.totalPages = data['totalPages'];
+        this.size = data['totalElements'];
+      });
+  }
+
   private changeFilterValueToEmpty(key_name: (keyof typeof this.filteredValues)) {
     Object.entries(this.filteredValues).find(([key]) => {
       if (key === key_name)
@@ -142,6 +152,7 @@ export class UserPageComponent implements OnInit {
     if (filterValue.trim().length !== 0)
       this.userService
         .suggest(column, filterValue, this.filteredValues)
+        .pipe(takeUntil(this.onDestroy$))
         .subscribe((data: any) => {
           this.keywordSuggestionOptions[column] = data['keywordList'];
         });

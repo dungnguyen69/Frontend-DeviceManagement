@@ -1,18 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 import { LocalService } from 'src/app/services/local.service';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
 import { UserService } from 'src/app/services/user.service';
-import { USER } from 'src/app/utils/constant';
+import { USER } from 'src/assets/constant';
 
 @Component({
   selector: 'app-profile-page',
   templateUrl: './profile-page.component.html',
   styleUrls: ['./profile-page.component.scss']
 })
-export class ProfilePageComponent {
+export class ProfilePageComponent implements OnInit, OnDestroy {
+  onDestroy$: Subject<boolean> = new Subject();
   profileForm: FormGroup;
   submitted = false;
   USERNAME = 1;
@@ -63,24 +65,20 @@ export class ProfilePageComponent {
         Validators.required
       ]))
     }, { updateOn: 'change' });
-
-    // this.profileForm.controls["owner"].valueChanges
-    //   .subscribe((value: string) => {
-    //     if (value.trim().length != 0) {
-    //       this.employeeSuggestion(this.USERNAME, value, true)
-    //     }
-    //     // else {
-    //     //   this.ownerSuggestions = [];
-    //     // }
-    //   })
-
-    // this.fetchDropdownValuesIntoSuggestions();
     this.checkLogin();
   }
 
+  ngOnDestroy() {
+    this.onDestroy$.next(true);
+    this.onDestroy$.unsubscribe();
+  }
+
+
   onSubmit() {
     if (this.profileForm.valid) {
-      this.userService.updateProfile(this.profileForm.value)
+      this.userService
+        .updateProfile(this.profileForm.value)
+        .pipe(takeUntil(this.onDestroy$))
         .subscribe
         (
           {

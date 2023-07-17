@@ -132,7 +132,7 @@
               <mat-form-field appearance="outline">
                 <mat-select matNativeControl formControlName="screenId">
                   <mat-option *ngFor="let screenSize of suggestionOptions[columnIndex.SCREEN]" [value]="screenSize.id">
-                    {{screenSize.size}} inch
+                    {{screenSize.size}}
                   </mat-option>
                 </mat-select>
                 <mat-error *ngIf="addDeviceForm.controls['screenId'].hasError('required')">Screen

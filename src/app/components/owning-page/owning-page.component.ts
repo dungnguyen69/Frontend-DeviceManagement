@@ -1,5 +1,5 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -8,7 +8,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { IDevice } from 'src/app/models/IDevice';
 import { DeviceService } from 'src/app/services/device.service';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
-import { constants } from 'src/app/utils/constant';
+import { constants } from 'src/assets/constant';
 import { UpdateDeviceComponent } from '../update-device/update-device.component';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { PageEvent } from '@angular/material/paginator';
@@ -16,15 +16,18 @@ import { AddDeviceComponent } from '../add-device/add-device.component';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import * as saveAs from 'file-saver';
 import { ImportDeviceComponent } from '../import-device/import-device.component';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-owning-page',
   templateUrl: './owning-page.component.html',
   styleUrls: ['./owning-page.component.scss']
 })
-export class OwningPageComponent {
+export class OwningPageComponent implements OnInit, OnDestroy {
   @Output() isUpdatedSuccessful = new EventEmitter<any>();
   @Output() countNumberOfBookingDevices = new EventEmitter<any>();
+  onDestroy$: Subject<boolean> = new Subject();
+
   selection = new SelectionModel<IDevice>(true, []);
   pageIndex: number = 0;
   pageSize: number = 10;
@@ -109,6 +112,11 @@ export class OwningPageComponent {
     this.checkDateInput();
   }
 
+  ngOnDestroy() {
+    this.onDestroy$.next(true);
+    this.onDestroy$.unsubscribe();
+  }
+
   openDialogAddDevice() {
     const dialogRef = this.dialog.open(AddDeviceComponent, {
       autoFocus: false
@@ -132,18 +140,21 @@ export class OwningPageComponent {
   }
 
   exportDevice() {
-    this.deviceService.exportDeviceForOwner(this.userId).subscribe((data: any) => {
-      let datetime = new Date()
-      let currentTime = (datetime.getFullYear() + '-' +
-        this.formatNumber(datetime.getMonth() + 1) + '-' +
-        this.formatNumber(datetime.getDate()) + ' ' +
-        this.formatNumber(datetime.getHours()) + '-' +
-        this.formatNumber(datetime.getMinutes()) + '-' +
-        this.formatNumber(datetime.getSeconds())).toString();
-      let exportDate = "Export_File_" + currentTime + ".xlsx";
-      this.downLoadFile(exportDate, data, "application/ms-excel");
-    }
-    )
+    this.deviceService
+      .exportDeviceForOwner(this.userId)
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe((data: any) => {
+        let datetime = new Date()
+        let currentTime = (datetime.getFullYear() + '-' +
+          this.formatNumber(datetime.getMonth() + 1) + '-' +
+          this.formatNumber(datetime.getDate()) + ' ' +
+          this.formatNumber(datetime.getHours()) + '-' +
+          this.formatNumber(datetime.getMinutes()) + '-' +
+          this.formatNumber(datetime.getSeconds())).toString();
+        let exportDate = "Export_File_" + currentTime + ".xlsx";
+        this.downLoadFile(exportDate, data, "application/ms-excel");
+      }
+      )
   }
 
   importDevice() {
@@ -247,6 +258,7 @@ export class OwningPageComponent {
     if (filterValue.trim().length !== 0)
       this.deviceService
         .suggestKeywordForOwnerPage(this.userId, column, filterValue, this.filteredValues)
+        .pipe(takeUntil(this.onDestroy$))
         .subscribe((data: any) => {
           this.keywordSuggestionOptions[column] = data['keywordList'];
         });
@@ -301,10 +313,13 @@ export class OwningPageComponent {
   }
 
   updateReturnOwnedDevice(row: any) {
-    this.deviceService.updateReturnOwnedDevice(row.Id, this.userId).subscribe((data: any) => {
-      this.notification("UPDATED SUCCESSFULLY", 'Close', "success-snackbar")
-      this.getAllDevicesWithPagination();
-    })
+    this.deviceService
+      .updateReturnOwnedDevice(row.Id, this.userId)
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe((data: any) => {
+        this.notification("UPDATED SUCCESSFULLY", 'Close', "success-snackbar")
+        this.getAllDevicesWithPagination();
+      })
   }
   private downLoadFile(fileName: string, data: any, type: string) {
     let blob = new Blob([data], { type: type });
@@ -323,6 +338,7 @@ export class OwningPageComponent {
   private getAllDevicesWithPagination() {
     this.deviceService
       .getAllOwningDevicesWithPagination(this.userId, this.pageSize!, this.pageIndex + 1, this.sortBy, this.sortDir, this.filteredValues)
+      .pipe(takeUntil(this.onDestroy$))
       .subscribe((data: any) => {
         this.dataSource.data = data['devicesList'];
         this.dropdownOptions.status = data['statusList'];
@@ -356,15 +372,19 @@ export class OwningPageComponent {
   }
 
   private checkDateInput() {
-    this.dateFormControlnOptions[this.BOOKING_DATE].valueChanges.subscribe((value: string) => {
-      if (value != "" && value != null)
-        this.applyFilterForDatePicker("bookingDate", value);
-    })
+    this.dateFormControlnOptions[this.BOOKING_DATE].valueChanges
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe((value: string) => {
+        if (value != "" && value != null)
+          this.applyFilterForDatePicker("bookingDate", value);
+      })
 
-    this.dateFormControlnOptions[this.RETURN_DATE].valueChanges.subscribe((value: string) => {
-      if (value != "" && value != null)
-        this.applyFilterForDatePicker("returnDate", value);
-    })
+    this.dateFormControlnOptions[this.RETURN_DATE].valueChanges
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe((value: string) => {
+        if (value != "" && value != null)
+          this.applyFilterForDatePicker("returnDate", value);
+      })
   }
 
   private checkLogin() {
@@ -399,16 +419,19 @@ export class OwningPageComponent {
   private deleteDevice(selectList: any) {
     if (selectList.length != 0) {
       for (var device of selectList) {
-        this.deviceService.deleteDevice(device.Id!).subscribe({
-          next: () => {
-            this.getAllDevicesWithPagination();
-            this.notification("DELETED SUCCESSFULLY", 'Close', "success-snackbar");
-          },
-          error: (error) => {
-            let errorMessage = error.error.errorMessage;
-            this.notification(errorMessage, 'Close', "error-snackbar");
-          }
-        });
+        this.deviceService
+          .deleteDevice(device.Id!)
+          .pipe(takeUntil(this.onDestroy$))
+          .subscribe({
+            next: () => {
+              this.getAllDevicesWithPagination();
+              this.notification("DELETED SUCCESSFULLY", 'Close', "success-snackbar");
+            },
+            error: (error) => {
+              let errorMessage = error.error.errorMessage;
+              this.notification(errorMessage, 'Close', "error-snackbar");
+            }
+          });
       }
     }
   }

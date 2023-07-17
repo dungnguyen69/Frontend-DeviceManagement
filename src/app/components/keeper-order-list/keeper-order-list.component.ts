@@ -8,7 +8,8 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 })
 export class KeeperOrderListComponent implements OnInit {
   keeperOrderList: any = [];
-  constructor(private dialogRef: MatDialogRef<KeeperOrderListComponent>,
+  constructor(
+    private dialogRef: MatDialogRef<KeeperOrderListComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any) {
     this.keeperOrderList = data.list;
   }

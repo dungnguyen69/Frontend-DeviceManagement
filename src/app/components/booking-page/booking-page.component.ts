@@ -1,5 +1,5 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
@@ -8,7 +8,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { IDevice } from 'src/app/models/IDevice';
 import { DeviceService } from 'src/app/services/device.service';
-import { constants } from 'src/app/utils/constant';
+import { constants } from 'src/assets/constant';
 import { UpdateDeviceComponent } from '../update-device/update-device.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Sort } from '@angular/material/sort';
@@ -16,6 +16,7 @@ import { LocalService } from 'src/app/services/local.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { IRequest } from 'src/app/models/IRequest';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
+import { Subject, takeUntil } from 'rxjs';
 export const DD_MM_YYYY_Format = {
     parse: {
         dateInput: 'DD/MM/YYYY',
@@ -38,11 +39,11 @@ export const DD_MM_YYYY_Format = {
         { provide: MAT_DATE_FORMATS, useValue: DD_MM_YYYY_Format },
     ],
 })
-export class BookingPageComponent implements OnInit {
+export class BookingPageComponent implements OnInit, OnDestroy {
 
     @Output() isUpdatedSuccessful = new EventEmitter<any>();
     @Output() countNumberOfBookingDevices = new EventEmitter<any>();
-
+    onDestroy$: Subject<boolean> = new Subject();
     selection = new SelectionModel<IDevice>(true, []);
     pageIndex: number = 0;
     pageSize: number = 10;
@@ -127,6 +128,11 @@ export class BookingPageComponent implements OnInit {
         this.checkLogin();
     }
 
+    ngOnDestroy() {
+        this.onDestroy$.next(true);
+        this.onDestroy$.unsubscribe();
+    }
+
     applyFilterForDatePicker(column: string, option: string) {
         this.pageIndex = 0; /* Reset index */
         this.filteredValues = {
@@ -183,6 +189,7 @@ export class BookingPageComponent implements OnInit {
         if (filterValue.trim().length !== 0)
             this.deviceService
                 .suggest(column, filterValue, this.filteredValues)
+                .pipe(takeUntil(this.onDestroy$))
                 .subscribe((data: any) => {
                     this.keywordSuggestionOptions[column] = data['keywordList'];
                 });
@@ -307,10 +314,13 @@ export class BookingPageComponent implements OnInit {
         return archive;
     }
 
-    getAllDevicesWithPagination() {
+    private getAllDevicesWithPagination() {
         this.deviceService
             .getAllDevicesWithPagination(this.pageSize!, this.pageIndex + 1, this.sortBy, this.sortDir, this.filteredValues)
+            .pipe(takeUntil(this.onDestroy$))
             .subscribe((data: any) => {
+                console.table(data['devicesList']);
+
                 this.dataSource.data = data['devicesList'];
                 this.dropdownOptions.status = data['statusList'];
                 this.dropdownOptions.itemType = data['itemTypeList'];
@@ -344,15 +354,19 @@ export class BookingPageComponent implements OnInit {
     }
 
     private checkDateInput() {
-        this.dateFormControlnOptions[this.BOOKING_DATE].valueChanges.subscribe((value: string) => {
-            if (value != "" && value != null)
-                this.applyFilterForDatePicker("bookingDate", value);
-        })
+        this.dateFormControlnOptions[this.BOOKING_DATE].valueChanges
+            .pipe(takeUntil(this.onDestroy$))
+            .subscribe((value: string) => {
+                if (value != "" && value != null)
+                    this.applyFilterForDatePicker("bookingDate", value);
+            })
 
-        this.dateFormControlnOptions[this.RETURN_DATE].valueChanges.subscribe((value: string) => {
-            if (value != "" && value != null)
-                this.applyFilterForDatePicker("returnDate", value);
-        })
+        this.dateFormControlnOptions[this.RETURN_DATE].valueChanges
+            .pipe(takeUntil(this.onDestroy$))
+            .subscribe((value: string) => {
+                if (value != "" && value != null)
+                    this.applyFilterForDatePicker("returnDate", value);
+            })
     }
 
     private checkLogin() {
@@ -366,12 +380,4 @@ export class BookingPageComponent implements OnInit {
             this.username = user.username;
         }
     }
-
-    // private allowUpdate() {
-    //     if (this.isAdmin)
-    //         return true;
-    //     else if (this.isMod)
-    //         return true;
-    //     return false;
-    // }
 }

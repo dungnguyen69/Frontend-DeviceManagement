@@ -35,7 +35,7 @@
                     <span>Detail</span>
                 </th>
                 <td mat-cell *matCellDef="let row;let i=index">
-                    <mat-icon (click)="openDialogUpdate(row.Id,i+1)" class="detail-icon">pageview</mat-icon>
+                    <mat-icon (click)="openDialogDetail(row.Id,i+1)" class="detail-icon">pageview</mat-icon>
                 </td>
             </ng-container>
             <ng-container matColumnDef="Update">

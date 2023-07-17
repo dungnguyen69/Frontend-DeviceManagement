@@ -1,7 +1,8 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Subject, takeUntil } from 'rxjs';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
 import { UserService } from 'src/app/services/user.service';
 
@@ -10,7 +11,8 @@ import { UserService } from 'src/app/services/user.service';
   templateUrl: './provide-permission.component.html',
   styleUrls: ['./provide-permission.component.scss']
 })
-export class ProvidePermissionComponent implements OnInit {
+export class ProvidePermissionComponent implements OnInit, OnDestroy {
+  onDestroy$: Subject<boolean> = new Subject();
   permissions: FormGroup;
   selected = '';
   username: string;
@@ -40,6 +42,11 @@ export class ProvidePermissionComponent implements OnInit {
     this.setInitialPermission();
   }
 
+  ngOnDestroy() {
+    this.onDestroy$.next(true);
+    this.onDestroy$.unsubscribe();
+  }
+
   disableOthers(controlName: string) {
     Object.keys(this.permissions.controls).forEach((key) => {
       if (key !== controlName) this.permissions.get(key)?.setValue(false);
@@ -59,15 +66,18 @@ export class ProvidePermissionComponent implements OnInit {
       test = "ROLE_USER";
     }
     if (test == undefined) {
-      this.notification('Please choose one of checkboxes',"Close", "error-snackbar");
+      this.notification('Please choose one of checkboxes', "Close", "error-snackbar");
       return;
     }
-    this.userService.providePermission(userId, test).subscribe({
-      next: () => {
-        this.dialogRef.close();
-        this.notification(`Updated ${this.roles[0]} to ${test} successfully`,"Close", "success-snackbar");
-      }
-    });
+    this.userService
+      .providePermission(userId, test)
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe({
+        next: () => {
+          this.dialogRef.close();
+          this.notification(`Updated ${this.roles[0]} to ${test} successfully`, "Close", "success-snackbar");
+        }
+      });
   }
 
   private checkLogin() {

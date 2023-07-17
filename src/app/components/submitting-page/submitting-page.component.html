@@ -142,34 +142,26 @@
                 </td>
             </ng-container>
 
-            <ng-container matColumnDef="Booking date">
+            <ng-container matColumnDef="Date">
                 <th mat-header-cell *matHeaderCellDef>
-                    <span>Booking date</span>
+                    <span>Booking Date - Return date</span>
                 </th>
-                <td mat-cell *matCellDef="let element; let index = index">
-                    <mat-form-field>
-                        <input matInput [matDatepicker]="picker" placeholder="Choose a date"
-                            [(ngModel)]="element.bookingDate">
-                        <mat-icon matDatepickerToggleIcon (click)="element.bookingDate = ''">clear</mat-icon>
-                        <mat-datepicker-toggle matSuffix [for]="picker"
-                            matTooltip="If the booking date intially emerges, it means the previous order's booking date, choose the greater date"></mat-datepicker-toggle>
-                        <mat-datepicker #picker></mat-datepicker>
-                    </mat-form-field>
-                </td>
-            </ng-container>
-
-            <ng-container matColumnDef="Due date">
-                <th mat-header-cell *matHeaderCellDef>
-                    <span>Due date</span>
-                </th>
-                <td mat-cell *matCellDef="let element;let index = index">
-                    <mat-form-field>
-                        <input matInput [matDatepicker]="picker" placeholder="Choose a date"
-                            [(ngModel)]="element.returnDate">
-                        <mat-icon matDatepickerToggleIcon (click)="element.returnDate = ''">clear</mat-icon>
-                        <mat-datepicker-toggle matSuffix [for]="picker"
-                            matTooltip="If the due date intially emerges, it means the previous order's due date, choose the lesser date"></mat-datepicker-toggle>
-                        <mat-datepicker #picker></mat-datepicker>
+                <td mat-cell *matCellDef="let element">
+                    <mat-form-field class="example-form-field">
+                        <mat-date-range-input [rangePicker]="rangePicker" [min]="element.bookingDate" [max]="element.returnDate">
+                            <input matStartDate placeholder="Booking date" [(ngModel)]="element.bookingDate">
+                            <input matEndDate placeholder="Return date" [(ngModel)]="element.returnDate">
+                        </mat-date-range-input>
+                        <mat-datepicker-toggle matIconSuffix [for]="rangePicker"></mat-datepicker-toggle>
+                        <mat-datepicker-toggle matSuffix>
+                            <mat-icon matDatepickerToggleIcon>clear</mat-icon>
+                        </mat-datepicker-toggle>
+                        <mat-date-range-picker #rangePicker>
+                            <mat-date-range-picker-actions>
+                                <button mat-button matDateRangePickerCancel>Cancel</button>
+                                <button mat-raised-button color="primary" matDateRangePickerApply>Apply</button>
+                            </mat-date-range-picker-actions>
+                        </mat-date-range-picker>
                     </mat-form-field>
                 </td>
             </ng-container>

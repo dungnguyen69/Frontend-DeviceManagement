@@ -1,18 +1,19 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { BookingPageComponent } from '../booking-page/booking-page.component';
 import { DeviceService } from 'src/app/services/device.service';
 import { MatDialogRef } from '@angular/material/dialog';
 import { saveAs } from 'file-saver';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-import-device',
   templateUrl: './import-device.component.html',
   styleUrls: ['./import-device.component.scss']
 })
-export class ImportDeviceComponent implements OnInit {
-
+export class ImportDeviceComponent implements OnInit, OnDestroy {
+  onDestroy$: Subject<boolean> = new Subject();
   fileName = null;
   errorMessage: string;
   fileUploaded: File;
@@ -32,8 +33,15 @@ export class ImportDeviceComponent implements OnInit {
     this.checkLogin();
   }
 
+  ngOnDestroy() {
+    this.onDestroy$.next(true);
+    this.onDestroy$.unsubscribe();
+  }
+
   onTemplateFileClick() {
-    this.importService.getTemplateImportDevice()
+    this.importService
+      .getTemplateImportDevice()
+      .pipe(takeUntil(this.onDestroy$))
       .subscribe(response => {
         this.downLoadFile("Template_Import_Device.xlsx", response, "application/ms-excel");
       })
@@ -70,7 +78,9 @@ export class ImportDeviceComponent implements OnInit {
     this.isLoading = true;
     let formData: FormData = new FormData();
     formData.append("file", this.fileUploaded);
-    this.importService.importDevice(this.userId, formData)
+    this.importService
+      .importDevice(this.userId, formData)
+      .pipe(takeUntil(this.onDestroy$))
       .subscribe(
         {
           next: () => {

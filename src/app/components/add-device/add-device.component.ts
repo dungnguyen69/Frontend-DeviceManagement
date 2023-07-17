@@ -1,18 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Subject, takeUntil } from 'rxjs';
 import { DeviceService } from 'src/app/services/device.service';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
 import { UserService } from 'src/app/services/user.service';
-import { ADD_DEVICE } from 'src/app/utils/constant';
+import { ADD_DEVICE } from 'src/assets/constant';
 
 @Component({
   selector: 'app-add-device',
   templateUrl: './add-device.component.html',
   styleUrls: ['./add-device.component.scss']
 })
-export class AddDeviceComponent implements OnInit {
+export class AddDeviceComponent implements OnInit, OnDestroy {
   addDeviceForm: FormGroup;
   submitted = false;
   USERNAME = 1;
@@ -22,6 +23,7 @@ export class AddDeviceComponent implements OnInit {
   isMod = false;
   isUser = false;
   userName: string;
+  onDestroy$: Subject<boolean> = new Subject();
 
   readonly suggestionOptions: { [key: string]: any } = {
     0: [],
@@ -91,6 +93,11 @@ export class AddDeviceComponent implements OnInit {
     this.fetchDropdownValuesIntoSuggestions();
   }
 
+  ngOnDestroy() {
+    this.onDestroy$.next(true);
+    this.onDestroy$.unsubscribe();
+  }
+
   getPlatformVersion(event: any): void {
     this.addDeviceForm.value.platformId = null;
     this.suggestionOptions[ADD_DEVICE.PLATFORM_VERSION] = this.unfilteredPlatformVersionSuggestions.filter((x: any) => x.name == event);
@@ -110,7 +117,9 @@ export class AddDeviceComponent implements OnInit {
     this.submitted = true;
     if (this.addDeviceForm.valid) {
       delete this.addDeviceForm.value.platformNameId;
-      this.deviceService.addDevice(this.addDeviceForm.value)
+      this.deviceService
+        .addDevice(this.addDeviceForm.value)
+        .pipe(takeUntil(this.onDestroy$))
         .subscribe
         (
           {
@@ -126,23 +135,26 @@ export class AddDeviceComponent implements OnInit {
   }
 
   private fetchDropdownValuesIntoSuggestions(): void {
-    this.deviceService.getDropDownValues().subscribe(
-      {
-        next: (response: any) => {
-          this.suggestionOptions[ADD_DEVICE.PLATFORM_NAME] = [...new Set(response['platformList'].map((a: any) => a.name))];
-          this.unfilteredPlatformVersionSuggestions = response['platformList'];
-          this.suggestionOptions[ADD_DEVICE.RAM] = response['ramList'];
-          this.suggestionOptions[ADD_DEVICE.SCREEN] = response['screenList'];
-          this.suggestionOptions[ADD_DEVICE.STORAGE] = response['storageList'];
-          this.suggestionOptions[ADD_DEVICE.STATUS] = response['statusList'];
-          this.suggestionOptions[ADD_DEVICE.PROJECT] = response['projectList'];
-          this.suggestionOptions[ADD_DEVICE.ORIGIN] = response['originList'];
-          this.suggestionOptions[ADD_DEVICE.ITEM_TYPE] = response['itemTypeList'];
-        },
-        error: (error) => {
-          console.error(error);
-        },
-      });
+    this.deviceService
+      .getDropDownValues()
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe(
+        {
+          next: (response: any) => {
+            this.suggestionOptions[ADD_DEVICE.PLATFORM_NAME] = [...new Set(response['platformList'].map((a: any) => a.name))];
+            this.unfilteredPlatformVersionSuggestions = response['platformList'];
+            this.suggestionOptions[ADD_DEVICE.RAM] = response['ramList'];
+            this.suggestionOptions[ADD_DEVICE.SCREEN] = response['screenList'];
+            this.suggestionOptions[ADD_DEVICE.STORAGE] = response['storageList'];
+            this.suggestionOptions[ADD_DEVICE.STATUS] = response['statusList'];
+            this.suggestionOptions[ADD_DEVICE.PROJECT] = response['projectList'];
+            this.suggestionOptions[ADD_DEVICE.ORIGIN] = response['originList'];
+            this.suggestionOptions[ADD_DEVICE.ITEM_TYPE] = response['itemTypeList'];
+          },
+          error: (error) => {
+            console.error(error);
+          },
+        });
   }
 
   //Check whether inputs whose tables are in the database match the database. 
@@ -165,14 +177,6 @@ export class AddDeviceComponent implements OnInit {
       duration: 10000,
       panelClass: ['error-snackbar']
     });
-  }
-
-  employeeSuggestion(column: number, keyword: string, isOwner: boolean): void {
-    this.userService.suggest(column, keyword)
-      .subscribe((data: any) => {
-        if (isOwner)
-          this.suggestionOptions[this.columnIndex.OWNER] = data['keywordList'];
-      });
   }
 
   private checkLogin() {

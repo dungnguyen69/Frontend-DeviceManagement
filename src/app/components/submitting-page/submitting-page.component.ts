@@ -1,24 +1,42 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import { ChangeDetectorRef, Component, EventEmitter, Inject, OnInit, Output } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { Component, EventEmitter, Inject, OnDestroy, OnInit, Output } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { IDevice } from 'src/app/models/IDevice';
 import { IRequest } from 'src/app/models/IRequest';
 import { LocalService } from 'src/app/services/local.service';
 import { UserService } from 'src/app/services/user.service';
-import { constants } from 'src/app/utils/constant';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RequestService } from 'src/app/services/request.service';
 import { UpdateDeviceComponent } from '../update-device/update-device.component';
+import { MomentDateAdapter } from '@angular/material-moment-adapter';
+import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
+import { Subject, takeUntil } from 'rxjs';
+
+const DD_MM_YYYY_Format = {
+  parse: {
+    dateInput: 'DD/MM/YYYY',
+  },
+  display: {
+    dateInput: 'DD/MM/YYYY',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
 
 @Component({
   selector: 'app-submitting-page',
   templateUrl: './submitting-page.component.html',
-  styleUrls: ['./submitting-page.component.scss']
+  styleUrls: ['./submitting-page.component.scss'],
+  providers: [
+    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
+    { provide: MAT_DATE_FORMATS, useValue: DD_MM_YYYY_Format },
+  ],
 })
-export class SubmittingPageComponent implements OnInit {
+export class SubmittingPageComponent implements OnInit, OnDestroy {
   @Output() recount = new EventEmitter<any>();
 
   submitted = false;
@@ -31,6 +49,7 @@ export class SubmittingPageComponent implements OnInit {
   readonly RETURN_DATE: number = 3;
   userInfo: any;
   nextKeeper = new FormControl();
+  onDestroy$: Subject<boolean> = new Subject();
   readonly formControlnOptions: { [key: string]: any } = {
     1: new FormControl(),
     2: new FormControl(),
@@ -44,7 +63,7 @@ export class SubmittingPageComponent implements OnInit {
   };
 
   readonly columns: string[] = ['Number', 'Detail', 'SerialNumber', 'Requester', 'CurrentKeeper', 'NextKeeper', 'DeviceName', 'ItemType', 'PlatformName', 'PlatformVersion',
-    'RamSize', 'DisplaySize', 'StorageSize', 'InventoryNumber', 'Comments', "Booking date", "Due date", 'Action'];
+    'RamSize', 'DisplaySize', 'StorageSize', 'InventoryNumber', 'Comments', "Date", 'Action'];
 
   constructor(
     public dialogRef: MatDialogRef<SubmittingPageComponent>,
@@ -59,6 +78,11 @@ export class SubmittingPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.getDataFromStorage();
+  }
+
+  ngOnDestroy() {
+    this.onDestroy$.next(true);
+    this.onDestroy$.unsubscribe();
   }
 
   getDataFromStorage() {
@@ -154,16 +178,18 @@ export class SubmittingPageComponent implements OnInit {
     dialogRef.afterClosed().subscribe({
       next: (result) => {
         if (result.event == "accept") {
-          this.requestService.submitRequests(input).subscribe({
-            next: (response: any) => {
-              this.returnSubmitError(response["failedRequestsList"]);
-            },
-            error: (error) => {
-              this.notification(error, 'Close', "error-snackbar")
-              throw error;
-            },
-          }
-          );
+          this.requestService.submitRequests(input)
+            .pipe(takeUntil(this.onDestroy$))
+            .subscribe({
+              next: (response: any) => {
+                this.returnSubmitError(response["failedRequestsList"]);
+              },
+              error: (error) => {
+                this.notification(error, 'Close', "error-snackbar")
+                throw error;
+              },
+            }
+            );
         }
       },
       error: (error) => {
@@ -251,6 +277,7 @@ export class SubmittingPageComponent implements OnInit {
 
   private employeeSuggestion(column: number, keyword: string): void {
     this.userService.suggest(column, keyword)
+      .pipe(takeUntil(this.onDestroy$))
       .subscribe((data: any) => {
         this.nextKeeperOptions = data['keywordList'];
       });

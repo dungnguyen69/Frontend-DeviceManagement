@@ -5,11 +5,17 @@
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <ul class="navbar-nav" *ngIf="!isLoggedIn">
-            <li class="nav-item">
-                <a href="/login" class="nav-link" routerLink="login">Login</a>
-            </li>
-        </ul>
+        <div class="collapse navbar-collapse justify-content-between" id="navbarSupportedContent" *ngIf="!isLoggedIn">
+            <ul class="navbar-nav">
+                <li class="nav-item ms-5">
+                    <a class="nav-link" [routerLink]="'/login'">Login</a>
+                </li>
+                <li class="nav-item ms-5">
+                    <a class="nav-link" [routerLink]="'/register'">Register</a>
+                </li>
+            </ul>
+        </div>
+
         <div class="collapse navbar-collapse justify-content-between" id="navbarSupportedContent" *ngIf="isLoggedIn">
             <ul class="navbar-nav ">
                 <li class="nav-item ms-5">
