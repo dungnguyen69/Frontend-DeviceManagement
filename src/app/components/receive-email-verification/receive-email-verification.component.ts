@@ -20,7 +20,7 @@ export class ReceiveEmailVerificationComponent implements OnInit, OnDestroy {
   token: any;
   status: string;
 
-  constructor(private authService: AuthService, private cookieService: CookieService,
+  constructor(private authService: AuthService,
     private route: ActivatedRoute
   ) { }
 
@@ -34,10 +34,13 @@ export class ReceiveEmailVerificationComponent implements OnInit, OnDestroy {
     if (this.token) {
       this.authService.verifyToken(this.token).subscribe(
         data => {
+          console.log(data);
+          
           this.status = data.status;
         }
         ,
         err => {
+          this.status = err.error.status;
           this.errorMessage = err.error.message;
         }
       );
