@@ -1,4 +1,4 @@
 export const environment = {
     production: false,
-    apiUrl: "http://localhost:8080/api"
+    apiUrl: "https://device-mangement-spring-aa9ec4381670.herokuapp.com/api"
 };
