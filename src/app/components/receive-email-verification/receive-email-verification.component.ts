@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { CookieService } from 'ngx-cookie-service';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
@@ -34,8 +33,6 @@ export class ReceiveEmailVerificationComponent implements OnInit, OnDestroy {
     if (this.token) {
       this.authService.verifyToken(this.token).subscribe(
         data => {
-          console.log(data);
-          
           this.status = data.status;
         }
         ,

@@ -28,7 +28,7 @@ export class AppComponent implements OnInit {
   checkLogin() {
     this.isLoggedIn = this.tokenStorageService.isLoggedIn();
     if (this.isLoggedIn) {
-      this.router.navigate(['/home']);
+      this.router.navigate(['/']);
       const user = this.tokenStorageService.getUser();
       this.roles = user.roles;
       this.isAdmin = this.roles.includes('ROLE_ADMIN');
