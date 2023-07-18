@@ -2,6 +2,18 @@ const express = require('express');
 const path = require('path');
 const app = express();
 
+const allowedOrigins = ['https://dungnguyen69.github.io/Frontend-DeviceManagement'];
+app.use(cors({
+    credentials: true,
+    origin: (origin, callback) => {
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true) 
+      } else {
+        callback(new Error(`Origin: ${origin} is now allowed`))
+      }
+    }
+  }));
+
 const forceSSL = function () {
   return function (req, res, next) {
     if (req.headers['x-forwarded-proto'] !== 'https') {
