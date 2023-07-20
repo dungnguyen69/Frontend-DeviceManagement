@@ -41,6 +41,7 @@ export class AppComponent implements OnInit {
   logout(): void {
     this.tokenStorageService.logOut();
     this.localService.clearData();
+    this.router.navigate(['/']);
     window.location.reload();
   }
 }

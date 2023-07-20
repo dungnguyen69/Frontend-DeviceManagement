@@ -70,10 +70,10 @@ export class BookingPageComponent implements OnInit, OnDestroy {
     };
     readonly columnsIndex = constants;
     readonly pageSizeOptions: number[] = [10, 20, 50, 100];
-    readonly columns: string[] = ['Number', 'Detail', 'SerialNumber', 'DeviceName', 'Status', 'ItemType', 'PlatformName', 'PlatformVersion',
-        'RamSize', 'DisplaySize', 'StorageSize', 'InventoryNumber', 'Project', 'Origin', 'Owner', 'Keeper', 'Comments', "KeeperNumber", "Booking", "Date"];
-    readonly columnFilters: string[] = ['NumberFilter', 'Update', 'SerialNumberFilter', 'DeviceNameFilter', 'StatusFilter', 'ItemTypeFilter', 'PlatformNameFilter', 'PlatformVersionFilter',
-        'RamSizeFilter', 'DisplaySizeFilter', 'StorageSizeFilter', 'InventoryNumberFilter', 'ProjectFilter', 'OriginFilter', 'OwnerFilter', 'KeeperFilter', 'CommentsFilter', "KeeperNumberFilter", 'book', "DateFilter"];
+    readonly columns: string[] = ['Number', 'SerialNumber', 'DeviceName', 'Status', 'ItemType', 'PlatformName', 'PlatformVersion',
+        'RamSize', 'DisplaySize', 'StorageSize', 'InventoryNumber', 'Project', 'Origin', 'Owner', 'Keeper', 'Comments', "KeeperNumber", 'Detail', "Booking", "Date"];
+    readonly columnFilters: string[] = ['NumberFilter', 'SerialNumberFilter', 'DeviceNameFilter', 'StatusFilter', 'ItemTypeFilter', 'PlatformNameFilter', 'PlatformVersionFilter',
+        'RamSizeFilter', 'DisplaySizeFilter', 'StorageSizeFilter', 'InventoryNumberFilter', 'ProjectFilter', 'OriginFilter', 'OwnerFilter', 'KeeperFilter', 'CommentsFilter', "KeeperNumberFilter", 'Update', 'book', "DateFilter"];
 
     /* Store filter options in an array*/
     readonly dropdownOptions: { [key: string]: any } = {
@@ -319,8 +319,7 @@ export class BookingPageComponent implements OnInit, OnDestroy {
             .getAllDevicesWithPagination(this.pageSize!, this.pageIndex + 1, this.sortBy, this.sortDir, this.filteredValues)
             .pipe(takeUntil(this.onDestroy$))
             .subscribe((data: any) => {
-                console.table(data['devicesList']);
-
+                // console.table(data['devicesList']);
                 this.dataSource.data = data['devicesList'];
                 this.dropdownOptions.status = data['statusList'];
                 this.dropdownOptions.itemType = data['itemTypeList'];

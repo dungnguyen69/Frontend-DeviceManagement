@@ -73,10 +73,10 @@ export class KeepingPageComponent implements OnInit, OnDestroy {
 
   readonly columnsIndex = constants;
   readonly pageSizeOptions: number[] = [10, 20, 50, 100];
-  readonly columns: string[] = ['Number', 'Detail', 'SerialNumber', 'DeviceName', 'Status', 'ItemType', 'PlatformName', 'PlatformVersion',
-    'RamSize', 'DisplaySize', 'StorageSize', 'InventoryNumber', 'Project', 'Origin', 'Owner', 'Keeper', 'Comments', "KeeperNumber", "Date", "MaxExtending", 'Action'];
-  readonly columnFilters: string[] = ['NumberFilter', 'Update', 'SerialNumberFilter', 'DeviceNameFilter', 'StatusFilter', 'ItemTypeFilter', 'PlatformNameFilter', 'PlatformVersionFilter',
-    'RamSizeFilter', 'DisplaySizeFilter', 'StorageSizeFilter', 'InventoryNumberFilter', 'ProjectFilter', 'OriginFilter', 'OwnerFilter', 'KeeperFilter', 'CommentsFilter', "KeeperNumberFilter", "DateFilter", 'maxExtending', 'select'];
+  readonly columns: string[] = ['Number', 'SerialNumber', 'DeviceName', 'Status', 'ItemType', 'PlatformName', 'PlatformVersion',
+    'RamSize', 'DisplaySize', 'StorageSize', 'InventoryNumber', 'Project', 'Origin', 'Owner', 'Keeper', 'Comments', "KeeperNumber", "Date", "MaxExtending", 'Detail', 'Action'];
+  readonly columnFilters: string[] = ['NumberFilter', 'SerialNumberFilter', 'DeviceNameFilter', 'StatusFilter', 'ItemTypeFilter', 'PlatformNameFilter', 'PlatformVersionFilter',
+    'RamSizeFilter', 'DisplaySizeFilter', 'StorageSizeFilter', 'InventoryNumberFilter', 'ProjectFilter', 'OriginFilter', 'OwnerFilter', 'KeeperFilter', 'CommentsFilter', "KeeperNumberFilter", "DateFilter", 'maxExtending', 'Update', 'select'];
 
   /* Store filter options in an array*/
   readonly dropdownOptions: { [key: string]: any } = {
