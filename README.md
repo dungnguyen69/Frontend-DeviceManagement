@@ -6,3 +6,7 @@
 
 - username: dungnc
 - password: 123456789
+
+# Technologies
+- Angular
+- Bootstrap
