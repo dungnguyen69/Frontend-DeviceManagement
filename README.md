@@ -1,7 +1,7 @@
 # FrontendDeviceManagement
 
-[](https://dungnguyen69.github.io/Frontend-DeviceManagement/home
-))
+[The main page](https://dungnguyen69.github.io/Frontend-DeviceManagement/home)
+
 ## Account to access
 
 username: dungnc
