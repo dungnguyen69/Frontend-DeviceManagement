@@ -1,6 +1,6 @@
 # FrontendDeviceManagement
 
-[The main page](https://dungnguyen69.github.io/Frontend-DeviceManagement/home)
+[The main page](https://jukibach.github.io/Frontend-DeviceManagement/home)
 
 # Account to access
 
