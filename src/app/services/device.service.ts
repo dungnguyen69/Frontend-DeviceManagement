@@ -87,11 +87,13 @@ export class DeviceService {
   }
 
   updateReturnOwnedDevice(deviceId: number, currentKeeperId: number): Observable<any> {
-    return this.http.put(this.baseUrl + `api/devices/owners/return?deviceId=${deviceId}&currentKeeperId=${currentKeeperId}`, config);
+    let inputs = { deviceId: deviceId, currentKeeperId: currentKeeperId }
+    return this.http.put(this.baseUrl + `api/devices/owners/return`, inputs, config);
   }
 
   updateReturnKeepingdDevice(deviceId: number, currentKeeperId: number, keeperNumber: number): Observable<any> {
-    return this.http.put(this.baseUrl + `api/devices/keepers/return?deviceId=${deviceId}&currentKeeperId=${currentKeeperId}&keeperNo=${keeperNumber}`, config);
+    let inputs = { deviceId: deviceId, currentKeeperId: currentKeeperId, keeperNo: keeperNumber }
+    return this.http.put(this.baseUrl + `api/devices/keepers/return`, inputs, config);
   }
 
   suggestKeywordForKeeperPage(keeperId: number, column: number, keyword: string, filteredValues?: any): Observable<any> {
