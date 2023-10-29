@@ -87,18 +87,11 @@ export class DeviceService {
   }
 
   updateReturnOwnedDevice(deviceId: number, currentKeeperId: number): Observable<any> {
-    let params = new HttpParams();
-    params = params.append('deviceId', deviceId);
-    params = params.append('currentKeeperId', currentKeeperId);
-    return this.http.put(this.baseUrl + `api/devices/owners/return`, params, { headers });
+    return this.http.put(this.baseUrl + `api/devices/owners/return?deviceId=${deviceId}&currentKeeperId=${currentKeeperId}`, { headers });
   }
 
   updateReturnKeepingdDevice(deviceId: number, currentKeeperId: number, keeperNumber: number): Observable<any> {
-    let params = new HttpParams();
-    params = params.append('deviceId', deviceId);
-    params = params.append('currentKeeperId', currentKeeperId);
-    params = params.append('keeperNo', keeperNumber);
-    return this.http.put(this.baseUrl + `api/devices/keepers/return`, params, { headers });
+    return this.http.put(this.baseUrl + `api/devices/keepers/return?deviceId=${deviceId}&currentKeeperId=${currentKeeperId}&keeperNo=${keeperNumber}`, { headers });
   }
 
   suggestKeywordForKeeperPage(keeperId: number, column: number, keyword: string, filteredValues?: any): Observable<any> {
