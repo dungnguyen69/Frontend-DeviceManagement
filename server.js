@@ -4,17 +4,11 @@ const app = express();
 app.use(helmet.contentSecurityPolicy());
 const cors = require('cors');
 
-const allowedOrigins = ['https://jukibach.github.io/Frontend-DeviceManagement'];
-app.use(cors({
-    credentials: true,
-    origin: (origin, callback) => {
-      if (allowedOrigins.includes(origin)) {
-        callback(null, true) 
-      } else {
-        callback(new Error(`Origin: ${origin} is now allowed`))
-      }
-    }
-  }));
+const corsConfig = {
+  credentials: true,
+  origin: true,
+};
+app.use(cors(corsConfig));
 
 const forceSSL = function () {
   return function (req, res, next) {
