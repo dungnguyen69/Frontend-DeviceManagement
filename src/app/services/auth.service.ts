@@ -24,21 +24,21 @@ export class AuthService {
   }
 
   verifyToken(token: any): Observable<any> {
-    let params = new HttpParams();
-    params = params.append('token', token);
-    return this.http.post(this.baseUrl + 'api/users/verify', { params: params });
+    return this.http.post(this.baseUrl + `api/users/verify?token=${token}`, {
+      headers: new HttpHeaders({ 'Content-Type': 'text/plain' })
+    });
   }
 
   verifyPasswordToken(token: any): Observable<any> {
-    let params = new HttpParams();
-    params = params.append('token', token);
-    return this.http.post(this.baseUrl + 'api/users/verify_reset_password_token', { params: params });
+    return this.http.post(this.baseUrl + `api/users/verify_reset_password_token?token=${token}`, {
+      headers: new HttpHeaders({ 'Content-Type': 'text/plain' })
+    });
   }
 
   resendToken(token: any): Observable<any> {
-    let params = new HttpParams();
-    params = params.append('existingToken', token);
-    return this.http.post(this.baseUrl + 'api/users/resendRegistrationToken', { params: params });
+    return this.http.post(this.baseUrl + `api/users/resendRegistrationToken?existingToken=${token}`, {
+      headers: new HttpHeaders({ 'Content-Type': 'text/plain' })
+    });
   }
 
   forgotPassword(email: string): Observable<any> {
