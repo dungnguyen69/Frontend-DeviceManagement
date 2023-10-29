@@ -2,7 +2,9 @@ const express = require('express');
 const path = require('path');
 const app = express();
 app.use(helmet.contentSecurityPolicy());
-const allowedOrigins = ['https://dungnguyen69.github.io/Frontend-DeviceManagement'];
+const cors = require('cors');
+
+const allowedOrigins = ['https://jukibach.github.io/Frontend-DeviceManagement'];
 app.use(cors({
     credentials: true,
     origin: (origin, callback) => {
