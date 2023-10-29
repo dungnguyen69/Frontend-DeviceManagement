@@ -1,4 +1,4 @@
 export const environment = {
     production: true,
-    apiUrl: "https://device-mangement-spring-aa9ec4381670.herokuapp.com/"
+    apiUrl: "ec2-18-141-43-16.ap-southeast-1.compute.amazonaws.com:8080"
 };

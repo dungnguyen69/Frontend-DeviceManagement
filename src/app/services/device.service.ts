@@ -103,7 +103,7 @@ export class DeviceService {
     Object.entries(filteredValues)
       .filter(([_, value]) => value != "")
       .forEach(([key, _]) => params = params.append(key, filteredValues[key]));
-    return this.http.get(this.baseUrl + `api/devices/keepers/suggestion/${keeperId}`, { params: params });
+    return this.http.get(this.baseUrl + `api/devices/keepers/${keeperId}/suggestion`, { params: params });
   }
 
   suggestKeywordForOwnerPage(ownerId: number, column: number, keyword: string, filteredValues?: any): Observable<any> {
@@ -113,7 +113,7 @@ export class DeviceService {
     Object.entries(filteredValues)
       .filter(([_, value]) => value != "")
       .forEach(([key, _]) => params = params.append(key, filteredValues[key]));
-    return this.http.get(this.baseUrl + `api/devices/owners/suggestion/${ownerId}`, { params: params });
+    return this.http.get(this.baseUrl + `api/devices/owners/${ownerId}/suggestion`, { params: params });
   }
 
   getAllKeepingDevicesWithPagination(keeperId: number, pageSize: number, pageNo: number, sortBy: string, sortDir: string, filteredValues?: any): Observable<any> {
